@@ -1,0 +1,5 @@
+HOST="localhost"
+DATABASE="trydb"
+USER="postgres"
+PASSWORD="itsjustme"
+PORT="5432"

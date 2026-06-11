@@ -11,48 +11,62 @@ from validation.phone_validation import validate_phones
 #from enrichment.email_enrichment import enrich_emails
 #from enrichment.phone_enrichment import enrich_phones
 #from enrichment.risk_scoring import score_risk
+from db.connection import get_connection
 
 def main():
-    df=pd.read_csv("data.csv")
+    try:
+        conn=get_connection()
+        print("Database connected successfully!")
+        cursor=conn.cursor()
+        cursor.execute("SELECT current_database();")
+        print(cursor.fetchone())
+        cursor.close()
+        conn.close()
+        '''
+        df=pd.read_csv("data.csv")
 
-    #validation
-    df=validate_names(df)
-    df=validate_dobs(df)
-    df=validate_phones(df)
-    df=validate_emails(df)
-    return df
-    '''#standardization
-    df=standardize_names(df)
-    df=standardize_dob(df)
-    df=standardize_phones(df)
-    df=standardize_emails(df)
-    df=standardize_country(df)
+        #validation
+        df=validate_names(df)
+        df=validate_dobs(df)
+        df=validate_phones(df)
+        df=validate_emails(df)
+        return df
+        #standardization
+        df=standardize_names(df)
+        df=standardize_dob(df)
+        df=standardize_phones(df)
+        df=standardize_emails(df)
+        df=standardize_country(df)
 
 
-    #enrichment
-    df=enrich_phones(df)
-    df=enrich_emails(df)
-    df=score_risk(df)
+        #enrichment
+        df=enrich_phones(df)
+        df=enrich_emails(df)
+        df=score_risk(df)
 
-    #write to cleaned customer records
+        #write to cleaned customer records
 
-    #deduplication
-    df=deduplicate(df)
+        #deduplication
+        df=deduplicate(df)
 
-    #scoring
-    df=dq_scoring(df)
+        #scoring
+        df=dq_scoring(df)
 
-    #write to master table
+        #write to master table
 
-    #calculate report metrics
-    df=calc_reportmetrics(df)
-    #calculate master table metrics
-    df=calc_dashboardmetrics(df)'''
+        #calculate report metrics
+        df=calc_reportmetrics(df)
+        #calculate master table metrics
+        df=calc_dashboardmetrics(df)'''
+    except Exception as e:
+        print("Error:", e)
+        
     
 if __name__=='__main__':
-    df=main()
+    main()
+    #df=main()
     #print(df)
     #print(df[['dob','cleaned_dob','parsed_dob','valid_dob','is_validdob','dob_issue']])
     #print(df[['firstname','lastname','is_validname','name_issue']])
-    print(df[['email','is_validemail','valid_emails','email_issue']])
-    print(df[[ "phoneno", "code","cleaned_phone","is_validphoneno","phoneno_issues"]])
+    #print(df[['email','is_validemail','valid_emails','email_issue']])
+    #print(df[[ "phoneno", "code","cleaned_phone","is_validphoneno","phoneno_issues"]])
