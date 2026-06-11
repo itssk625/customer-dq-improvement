@@ -1,0 +1,1 @@
+df['final_dob']=df['parsed_dob'].dt.strftime('%d-%m-%Y')
