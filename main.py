@@ -4,7 +4,7 @@ from validation.name_validation import validate_names
 from validation.email_validation import validate_emails
 from validation.phone_validation import validate_phones
 #from standardization.dob_standardization import standardize_dob
-#from standardization.name_standardization import standardize_names
+from standardization.name_standardization import standardize_names
 #from standardization.email_standardization import standardize_emails
 #from standardization.phone_standardization import standardize_phones
 #from standardization.country_standardization import standardize_country
@@ -55,9 +55,9 @@ def main():
         #write to master table
 
         #calculate report metrics
-        df=calc_reportmetrics(df)
+        df=calculate_reportmetrics(df)
         #calculate master table metrics
-        df=calc_dashboardmetrics(df)'''
+        df=calculate_dashboardmetrics(df)'''
     except Exception as e:
         print("Error:", e)
         

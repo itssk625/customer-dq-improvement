@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-'''df=pd.DataFrame({'email':['john.doe@example.com',
+df=pd.DataFrame({'email':['john.doe@example.com',
         'jane.doe@example.com',
         'ali.khan@example.com',
         'aisha.ahmed@example.com',
@@ -25,11 +25,18 @@ import numpy as np
     'john@@@example.com',       # Multiple @ (before cleaning)
     'john@com',                 # Domain missing dot
     'john@.com',                # Domain starts with dot
-    'john@gmail.',              # Domain ends with dot
+    'john@henry@gmail.',              # Domain ends with dot
+    '@gmail.com',
+    'john@',
+    'john@doe@gmail.com',
+    'johndoe@@gmail.com',
+    'john.gmail.com',
+    '.joh@gmail.com',
+    'john.@gmail.com',
     '12ab345678@example.com',   # Excessive numeric content
     '___@example.com',          # Weird username but passes many checks
     '111111111@example.com',
-    '13asdf4@example.com']})'''
+    '13asdf4@example.com']})
 
 def validate_emails(df):
     df=df.copy()
@@ -40,9 +47,13 @@ def validate_emails(df):
         .str.strip()
         .fillna('')
     )
+    
+    emptymask=(pd.isna(df['email']))|(df['email']=='')
+    df.loc[emptymask, 'is_validemail']=False
+    df.loc[emptymask, 'email_issue']+='Empty email'
 
-    valid=(df['email'].str.contains(r'@', regex=True, na=False))
-    no_separator=~valid
+    valid=(df['email'].str.contains(r'@', regex=True, na=False)) 
+    no_separator=~valid & ~emptymask
     df.loc[no_separator, 'is_validemail']=False
     df.loc[no_separator, 'email_issue']+='No @ separator, '
 
@@ -59,51 +70,64 @@ def validate_emails(df):
         .astype(str)
         .str.replace(r'[^a-zA-Z0-9\.@_]', '', regex=True)
     )
-    username=df['cleaned_email'].str.split('@').str[0]
-    domain=df['cleaned_email'].str.split('@').str[1]
-    emptymask=((pd.isna(username) )| (pd.isna(domain)) | (domain=='') | (username=='')) & ~no_separator & ~multiple_separator
-    df.loc[emptymask, 'is_validemail']=False
-    df.loc[emptymask, 'email_issue']+='Empty username or domain, '
+    username=df['cleaned_email'].str.rsplit('@', n=1).str[0]
+    domain=df['cleaned_email'].str.rsplit('@',n=1).str[1]
+    
+    emptyusername=((pd.isna(username)) | (username=='')) & (~no_separator) & (~multiple_separator)
+    df.loc[emptyusername & ~emptymask, 'is_validemail']=False
+    df.loc[emptyusername & ~emptymask, 'email_issue']+='Empty username, '
 
+    emptydomain=((pd.isna(domain)) | (domain=='')) & (~no_separator) & (~multiple_separator)
+    df.loc[emptydomain & ~emptymask, 'is_validemail']=False
+    df.loc[emptydomain & ~emptymask, 'email_issue']+='Empty domain, '
+    
     invaliddomain=((domain.str.startswith('.'))|(domain.str.endswith('.'))|(~(domain.str.contains(r'\.', regex=True, na=False))))  & ~multiple_separator & ~no_separator
-    df.loc[invaliddomain, 'is_validemail']=False
-    df.loc[invaliddomain, 'email_issue']+='Incomplete domain, '
+    df.loc[invaliddomain & ~emptydomain, 'is_validemail']=False
+    df.loc[invaliddomain & ~emptydomain, 'email_issue']+='Invalid domain, '
 
 
-    usernamehas_at=username.str.contains(r'@', regex=True)
+    usernamehas_at=username.str.contains('@', regex=False,na=False)
     df.loc[usernamehas_at, 'is_validemail']=False
     df.loc[usernamehas_at, 'email_issue']+='Username has @, '
+    
+    username_dots=(username.str.startswith('.')|username.str.endswith('.')) 
+    df.loc[username_dots, 'is_validemail']=False
+    df.loc[username_dots, 'email_issue']+='Username starts/ends with ., '
 
-    invalidlength=~((username.str.len()>=3) & (username.str.len()<=50)) & (~emptymask)
-    df.loc[invalidlength, 'is_validemail']=False
-    df.loc[invalidlength, 'email_issue']+='Username too long or short, '
 
-    numericname=(username.str.match(r'^\d+$')) & (username.str.len()>=5)
+    invalidlength=~((username.str.len()>=3) & (username.str.len()<=50)) 
+    df.loc[invalidlength & ~emptyusername, 'is_validemail']=False
+    df.loc[invalidlength & ~emptyusername, 'email_issue']+='Username too long or short, '
+    
+    
+    numericname=(username.str.match(r'^\d+$').fillna(False)) & (username.str.len()>=5)
     df.loc[numericname, 'is_validemail']=False
     df.loc[numericname, 'email_issue']+='Numeric-only username, '
- 
-    excnumeric=(username.str.count(r'\d')>=8) 
-    df.loc[excnumeric, 'is_validemail']=False
-    df.loc[excnumeric, 'email_issue']+='Excessive numeric content'
-
+    
     keyboard_sequences=[
-        'qwerty',
-        'asdf',
-        'zxcv',
-        '12345',
-        '123456',
-        'qazwsx'
+            'qwerty',
+            'asdf',
+            'zxcv',
+            '12345',
+            '123456',
+            'qazwsx'
     ]
 
     pattern='|'.join(keyboard_sequences)
     contains_keyboardseq=username.str.contains(
-        pattern,
-        case=False,
-        na=False
+            pattern,
+            case=False,
+            na=False
     )
 
-    df.loc[contains_keyboardseq, 'is_validemail']=False
-    df.loc[contains_keyboardseq, 'email_issue']='Contains keyboard sequences'
+    df.loc[contains_keyboardseq & ~numericname, 'is_validemail']=False
+    df.loc[contains_keyboardseq & ~numericname, 'email_issue']+='Contains keyboard sequences'
+    
+    excnumeric=(username.str.count(r'\d')>=8) 
+    df.loc[excnumeric & ~numericname, 'is_validemail']=False
+    df.loc[excnumeric & ~numericname, 'email_issue']+='Excessive numeric content'
+
+    
     df['email_issue']=df['email_issue'].str.strip()
     df['email_issue']=df['email_issue'].str.replace(r',$','',regex=True)
     df['email_issue']=df['email_issue'].replace('',np.nan)
@@ -112,6 +136,6 @@ def validate_emails(df):
     return df
 
 
-#df=validate_emails(df)
-#print(df[['email','is_validemail','valid_emails','email_issue']])
+df=validate_emails(df)
+print(df[['email','email_issue']])
 
