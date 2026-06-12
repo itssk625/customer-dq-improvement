@@ -121,21 +121,20 @@ def validate_emails(df):
     )
 
     df.loc[contains_keyboardseq & ~numericname, 'is_validemail']=False
-    df.loc[contains_keyboardseq & ~numericname, 'email_issue']+='Contains keyboard sequences'
+    df.loc[contains_keyboardseq & ~numericname, 'email_issue']+='Contains keyboard sequences, '
     
     excnumeric=(username.str.count(r'\d')>=8) 
     df.loc[excnumeric & ~numericname, 'is_validemail']=False
-    df.loc[excnumeric & ~numericname, 'email_issue']+='Excessive numeric content'
+    df.loc[excnumeric & ~numericname, 'email_issue']+='Excessive numeric content, '
 
     
-    df['email_issue']=df['email_issue'].str.strip()
-    df['email_issue']=df['email_issue'].str.replace(r',$','',regex=True)
+    #df['email_issue']=df['email_issue'].str.strip()
+    #df['email_issue']=df['email_issue'].str.replace(r',$','',regex=True)
     df['email_issue']=df['email_issue'].replace('',np.nan)
     valid_mask=df['is_validemail']
     df.loc[valid_mask, 'valid_emails']=df['cleaned_email']
     return df
 
 
-df=validate_emails(df)
-print(df[['email','email_issue']])
+
 

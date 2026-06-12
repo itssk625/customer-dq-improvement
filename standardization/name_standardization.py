@@ -1,10 +1,5 @@
 import pandas as pd
-df=pd.DataFrame({
-        'cleaned_firstname': ['JOHn', 'Abdul', 'PEEeTi', 'Aisha', 'Robert'],
-        'cleaned_lastname':  ['Smith', 'HUSsain', 'Sharma', 'Ahmed', 'Taylor'],
-        'is_validname':      [True, True, True, True, True]
-    })
-
+import numpy as np
 def standardize_names(df):
     df=df.copy()
     df['concatenated_name']=''
@@ -12,5 +7,6 @@ def standardize_names(df):
     df.loc[valid, 'cleaned_firstname']=df.loc[valid, 'cleaned_firstname'].str[0].str.upper()+df.loc[valid, 'cleaned_firstname'].str[1:].str.lower()
     df.loc[valid, 'cleaned_lastname']=df.loc[valid, 'cleaned_lastname'].str[0].str.upper()+df.loc[valid, 'cleaned_lastname'].str[1:].str.lower()
     df.loc[valid, 'concatenated_name']=df.loc[valid,'cleaned_firstname']+" "+df.loc[valid,'cleaned_lastname']
+    df['concatenated_name']=df['concatenated_name'].replace('',np.nan,regex=False)
     return df
     
