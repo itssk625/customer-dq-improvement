@@ -3,7 +3,7 @@ from validation.dob_validation import validate_dobs
 from validation.name_validation import validate_names
 from validation.email_validation import validate_emails
 from validation.phone_validation import validate_phones
-#from standardization.dob_standardization import standardize_dob
+from standardization.dob_standardization import standardize_dobs
 from standardization.name_standardization import standardize_names
 from standardization.email_standardization import standardize_emails
 #from standardization.phone_standardization import standardize_phones
@@ -20,13 +20,13 @@ def main():
         
         #validation
         df=validate_names(df)
-        #df=validate_dobs(df)
+        df=validate_dobs(df)
         #df=validate_phones(df)
         df=validate_emails(df)
         
         #standardization
         df=standardize_names(df)
-        #df=standardize_dob(df)
+        df=standardize_dobs(df)
         #df=standardize_phones(df)
         df=standardize_emails(df)
         #df=standardize_country(df)
@@ -59,7 +59,7 @@ if __name__=='__main__':
     df=main()
     #df=main()
     #print(df)
-    #print(df[['dob','cleaned_dob','parsed_dob','valid_dob','is_validdob','dob_issue']])
+    print(df[['dob','cleaned_dob','parsed_dob','valid_dob','is_validdob','dob_issue']])
     print(df[['concatenated_name','is_validname','name_issue']])
     print(df[['email','valid_emails','email_issue','suggested_domain']])
     #print(df[[ "phoneno", "code","cleaned_phone","is_validphoneno","phoneno_issues"]])

@@ -41,6 +41,7 @@ def validate_dobs(df):
 
     valid_mask=df['is_validdob']
     df.loc[valid_mask,'valid_dob']=df['parsed_dob']
+    df.loc[valid_mask,'valid_dob']=pd.to_datetime(df.loc[valid_mask,'valid_dob'],errors="coerce")
     return df
 
 #df=validate_dobs(df)
