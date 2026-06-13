@@ -99,13 +99,11 @@ country_codes = {
     "976",  # Mongolia
     "977",  # Nepal
 }
-'''
+
 df = pd.DataFrame(
     {
         "phoneno": [
             "+91 9876543210",
-            "(202) 555-0173",
-            "202.555.0173",
             "+44 20 7946 0958",
             "12345",
             "0000000000",
@@ -114,6 +112,7 @@ df = pd.DataFrame(
             "00000034203525245",
             None,
             "+918373849247, +98948148934",
+            "+91-0000000000",
             "+91-9845342455",  # India
             "+44 1234567890",  # UK
             "91-9845342455",  # India without +
@@ -138,7 +137,7 @@ df = pd.DataFrame(
         ]
     }
 )
-'''
+
 
 def validate_phones(df):
     df=df.copy()
@@ -157,7 +156,22 @@ def validate_phones(df):
     known_code = ~emptymask & (sep_mask)
     unknown_code = (~emptymask & ~sep_mask)  
     
-    df.loc[known_code & sep_mask, "code"] = df.loc[known_code & sep_mask, "phoneno"].str.extract(r"^\+?(\d{1,})[\ -]")[0]
+    parts = df['phoneno'].str.split(r'[ -]', n=1)
+    df.loc[known_code & sep_mask, "code"] =  parts.str[0].str.replace(r'[^\d]','',regex=True)
+    df.loc[known_code & sep_mask, "subscriber_number"] = parts.str[1].str.replace(' ', '')
+    
+    df.loc[unknown_code,'subscriber_number']=(
+        df.loc[unknown_code, 'phoneno']
+        .str.strip()
+        .str.replace(r"[^0-9]", "", regex=True)
+    )
+    
+    setcode=df['subscriber_number'].isin(country_codes)
+    df.loc[setcode,'code']
+    empty_subscriber=(pd.isna(df['subscriber_number']))|(df['subscriber_number']=='')
+    df.loc[empty_subscriber & known_code, 'is_validphoneno']=False
+    df.loc[empty_subscriber & known_code, 'phoneno_issues']+='Empty subscriber number, '
+    
     is_validcodes = ((df["code"].str.len() <= 3)
     & (df["code"].str.len() > 0)
     & (df["code"].isin(country_codes))
@@ -175,24 +189,26 @@ def validate_phones(df):
     ) 
 
     lengthmask = ((df["cleaned_phone"].str.len() < 8) | (df["cleaned_phone"].str.len() > 18)) & (~emptymask)
-    df.loc[lengthmask, "is_validphoneno"] = False
-    df.loc[lengthmask, "phoneno_issues"]+= "Invalid length, "
+    df.loc[lengthmask & ~empty_subscriber, "is_validphoneno"] = False
+    df.loc[lengthmask & ~empty_subscriber, "phoneno_issues"]+= "Invalid length, "
 
-    allzero = df["cleaned_phone"].str.match(r"^0+$").fillna(False)
-    df.loc[~emptymask & allzero, "is_validphoneno"] = False
-    df.loc[~emptymask & allzero, "phoneno_issues"]+= "All zeroes phone number"
+    df['checked_number']=np.where(known_code, df['subscriber_number'], df['cleaned_phone'])
+    
+    allzero = df["checked_number"].str.match(r"^0+$").fillna(False)
+    df.loc[~emptymask & allzero & ~empty_subscriber, "is_validphoneno"] = False
+    df.loc[~emptymask & allzero & ~empty_subscriber, "phoneno_issues"]+= "All zeroes phone number"
 
-    leadzero = df["cleaned_phone"].str.match(r"^0{4,}\d+$").fillna(False) & ~allzero
-    df.loc[~emptymask & leadzero, "is_validphoneno"] = False
-    df.loc[~emptymask & leadzero, "phoneno_issues"]+= "Leading zeroes phone number, "
+    leadzero = df["checked_number"].str.match(r"^0{4,}\d+$").fillna(False) & ~allzero
+    df.loc[~emptymask & leadzero & ~empty_subscriber, "is_validphoneno"] = False
+    df.loc[~emptymask & leadzero & ~empty_subscriber, "phoneno_issues"]+= "Leading zeroes phone number, "
 
-    trailzero = df["cleaned_phone"].str.match(r"^\d+0{4,}$").fillna(False) & ~allzero
-    df.loc[~emptymask & trailzero, "is_validphoneno"] = False
-    df.loc[~emptymask & trailzero, "phoneno_issues"]+= "Trailing zeroes phone number, "
-
-    repdig = df["cleaned_phone"].str.match(r"^(\d)\1+$").fillna(False) & ~allzero
-    df.loc[~emptymask & repdig, "is_validphoneno"] = False
-    df.loc[~emptymask & repdig, "phoneno_issues"]+= "Repeating digits phone number"
+    trailzero = df["checked_number"].str.match(r"^\d+0{4,}$").fillna(False) & ~allzero
+    df.loc[~emptymask & trailzero & ~empty_subscriber, "is_validphoneno"] = False
+    df.loc[~emptymask & trailzero & ~empty_subscriber, "phoneno_issues"]+= "Trailing zeroes phone number, "
+ 
+    repdig = df["checked_number"].str.match(r"^(\d)\1+$").fillna(False) & ~allzero
+    df.loc[~emptymask & repdig & ~empty_subscriber, "is_validphoneno"] = False
+    df.loc[~emptymask & repdig & ~empty_subscriber, "phoneno_issues"]+= "Repeating digits phone number"
 
     validmask=df["is_validphoneno"] == True
     df.loc[validmask, "valid_phone"] = df.loc[validmask, "cleaned_phone"]
@@ -202,5 +218,5 @@ def validate_phones(df):
     df['phoneno_issues']=df['phoneno_issues'].replace('',np.nan)
     return df
 
-#df=validate_phones(df)
-#print(df[["phoneno", "code","cleaned_phone","valid_phone","is_validphoneno", "phoneno_issues"]])
+df=validate_phones(df)
+print(df[["phoneno", "code","subscriber_number","checked_number", "phoneno_issues"]])

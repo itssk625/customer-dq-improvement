@@ -1,31 +1,55 @@
-firstname,lastname,dob,email,phoneno,nationality
-John,Doe,12-05-1998,john.doe@gmail.com,+91-9876543210,India
-Mary,Smith,1995/-07/20,mary.smith@gmial.com,+971-501234567,uaE
-Ahmed,Khan,31/12/1990,ahmed.khan@gmail.com,97455123456,Qatar
-qWERty,User,01-01-2000,test.user@gmail.com,0000000000,India
-aaaaa,Khan,15-08-1995,aaaa@gmail.com,1111111111,Pakistan
-Ali,,20-10-1998,ali@gmail.com,+92-3001234567,Pakistan
-,Ahmed,05-05-1999,ahmed@gmail.com,+974-55123456,Qatar
-John,Doe,12-05-1998,john.doe@gmail.com,+91-9876543210,India
-Sara,Ali,12/13/1995,sara@gmail.com,+96891234567,Omn
-Mike,Brown,01-01-2180,mike@gmail@co.uk,+14155552671,untied States
-David,Wilson,01-01-1900,david@gmail.com,+447911123456,United Kingdom
-Chris,EVans,15.07.1998,chris@@gmail.com,+919876543210,India
-Fatima,Khan,20-06-1997,fatima.gmail.com,+971501234567,UAE
-Rahul,Sharma,10-10-1995,rahul@,919876543210,India
-Priya,Patel,11-11-1994,@gmail.com,+919876543211,India
-Aisha,Khan,12-12-1993,aisha@gmail..com,+97455123457,Qatar
-Robert,King,13-03-1992,123456@gmail.com,+14155552672,United States
-Keyboard,Qwerty,14-04-1991,qwerty123@gmail.com,+14155552673,United States
-James,Miller,15-05-1990,james@gmail.com,abc123456,United States
-SoPHIa,Davis,16-06-1989,sophia@gmail.com,+999123456789,Canada
-Mohammed,Ali,17-07-1988,mohammed@gmail.com,+96891234568,Sultanate of Oman
-Mohammed,Ali,17-07-1988,mohammed@gmail.com,+96891234568,Oman
-Jane,Doe,18-08-1997,jane@gmail.con,+919876543212,India
-AKBAr,Khan,19-09-1996,akbar@gmail.com,919876543213,india
-Emily,Clark,20-10-1995,emily@gmail.com,+44-7911123457,UK
-Test123,User,21-11-1994,test123@gmail.com,+919876543214,India
-Zain,Ahmed,22-12-1993,temp@mailinator.com,+97455123458,Qatar
-Noor,Khan,23-01-1992,noor@gmail.com,+97455123459,Qatr
-Ali,Khan,24-02-1991,ali@gmail.com,+92-3001234567,Pakistan
-Ali,Khan,24-02-1991,ali.khan@gmail.com,+92-3001234567,Pakistan
+firstname,lastname,dob,nationality,gender,email,phoneno
+John,Doe,1999-05-14,India,Male,john.doe@gmail.com,+91-9876543210
+Anna,Smith,2000-01-20,Canada,Female,anna.smith@outlook.com,+1-4165551234
+Ali,Khan,1998-07-30,Pakistan,Male,ali.khan@yahoo.com,+92-3001234567
+Priya,Sharma,2001-09-18,India,Female,priya.sharma@gmail.com,+91-9988776655
+David,Brown,1997-11-11,United States,Male,david.brown@hotmail.com,+1-2125550000
+,Doe,1999-01-01,India,Male,john@gmail.com,+919876543210
+John,,1999-01-01,India,Male,john@gmail.com,+919876543210
+@@@,Doe,1999-01-01,India,Male,john@gmail.com,+919876543210
+Test,User,1999-01-01,India,Male,john@gmail.com,+919876543210
+Asdf,Qwerty,1999-01-01,India,Male,john@gmail.com,+919876543210
+Aaaaaaaa,Doe,1999-01-01,India,Male,john@gmail.com,+919876543210
+J,Doe,1999-01-01,India,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,,+919876543210
+John,Doe,1999-01-01,India,Male,johngmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,john@@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,john@,+919876543210
+John,Doe,1999-01-01,India,Male,john@gmail,+919876543210
+John,Doe,1999-01-01,India,Male,john..doe@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,123456789@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,asdf123@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,.john@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,john.@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,john@gmail.com,
+John,Doe,1999-01-01,India,Male,john@gmail.com,12345
+John,Doe,1999-01-01,India,Male,john@gmail.com,9999999999
+John,Doe,1999-01-01,India,Male,john@gmail.com,0000000000
+John,Doe,1999-01-01,India,Male,john@gmail.com,+91-0000000000
+John,Doe,1999-01-01,India,Male,john@gmail.com,+999999999999
+John,Doe,,India,Male,john@gmail.com,+919876543210
+John,Doe,2050-01-01,India,Male,john@gmail.com,+919876543210
+John,Doe,1900-01-01,India,Male,john@gmail.com,+919876543210
+John,Doe,31-02-2020,India,Male,john@gmail.com,+919876543210
+John,Doe,99/99/9999,India,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,Atlantis,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,Moon,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,Narnia,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,USA,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,UK,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,UAE,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,Indai,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,Cnada,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,Australlia,Male,john@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,John.Doe@GMAIL.COM,+919876543210
+John,Doe,1999-01-01,India,Male,john.doe@gmial.com,+919876543210
+John,Doe,1999-01-01,India,Male,john.doe@outlok.com,+919876543210
+@@@,User,2050-01-01,Atlantis,Male,john@@gmail.com,0000000000
+Test,Qwerty,1900-01-01,Moon,Female,123456789@gmail,9999999999
+,,31-02-2020,Narnia,,@gmail.com,12345
+Aaaaaaaa,Doe,2050-01-01,Indai,Male,john..doe@gmail.com,0000000000
+John,Doe,1999-01-01,India,Male,duplicate@gmail.com,+919876543210
+Johnny,Doe,1999-01-01,India,Male,duplicate@gmail.com,+919999999999
+John,Doe,1999-01-01,India,Male,other@gmail.com,+919876543210

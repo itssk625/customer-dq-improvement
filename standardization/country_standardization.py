@@ -54,6 +54,66 @@ countries = [
     "sri lanka",
     "nepal"
 ]
+iso_codes={
+    "india": "IN",
+    "united states": "US",
+    "united kingdom": "GB",
+    "canada": "CA",
+    "australia": "AU",
+    "new zealand": "NZ",
+
+    "china": "CN",
+    "japan": "JP",
+    "south korea": "KR",
+    "singapore": "SG",
+    "malaysia": "MY",
+    "indonesia": "ID",
+    "thailand": "TH",
+    "vietnam": "VN",
+    "philippines": "PH",
+
+    "united arab emirates": "AE",
+    "saudi arabia": "SA",
+    "qatar": "QA",
+    "kuwait": "KW",
+    "oman": "OM",
+    "bahrain": "BH",
+
+    "germany": "DE",
+    "france": "FR",
+    "italy": "IT",
+    "spain": "ES",
+    "netherlands": "NL",
+    "switzerland": "CH",
+    "sweden": "SE",
+    "norway": "NO",
+    "denmark": "DK",
+    "ireland": "IE",
+
+    "south africa": "ZA",
+    "egypt": "EG",
+    "nigeria": "NG",
+    "kenya": "KE",
+    "morocco": "MA",
+
+    "brazil": "BR",
+    "argentina": "AR",
+    "mexico": "MX",
+    "chile": "CL",
+    "colombia": "CO",
+    "peru": "PE",
+
+    "russia": "RU",
+    "turkey": "TR",
+    "ukraine": "UA",
+    "poland": "PL",
+
+    "pakistan": "PK",
+    "bangladesh": "BD",
+    "sri lanka": "LK",
+    "nepal": "NP"
+    
+}
 country_aliases = {
     "republic of india": "india",
     "usa": "united states",
@@ -63,7 +123,6 @@ country_aliases = {
     "great britain": "united kingdom",
     "britain": "united kingdom",
     "england": "united kingdom",
-    "uae": "united arab emirates",
     "uae": "united arab emirates",
     "emirates": "united arab emirates",
     "korea": "south korea",
@@ -149,7 +208,8 @@ df = pd.DataFrame({
         'Atlantis',
         'Narnia'
     ]
-})'''
+})
+'''
 
 def standardize_country(df):
     df=df.copy()
@@ -158,9 +218,9 @@ def standardize_country(df):
     df.loc[emptymask, 'is_validnationality']=False
     df.loc[emptymask, 'nationality_issue']='No nationality provided'
     
-    valid=df['nationality'].str.contains(r'[a-zA-Z]',regex=True, na=False)
-    df.loc[~valid & ~emptymask, 'is_validnationality']=False
-    df.loc[~valid & ~emptymask, 'nationality_issue']='Invalid nationality'
+    contains_letters=df['nationality'].str.contains(r'[a-zA-Z]',regex=True, na=False)
+    df.loc[~contains_letters & ~emptymask, 'is_validnationality']=False
+    df.loc[~contains_letters & ~emptymask, 'nationality_issue']='Invalid nationality'
 
     df['cleaned_nationality']=(
         df['nationality']
@@ -182,13 +242,12 @@ def standardize_country(df):
             df.loc[idx, 'valid_nationality']=match[0]
         else:
             df.loc[idx, 'valid_nationality']=np.nan
-    df['valid_nationality']=df['valid_nationality'].str.title()
     mask=pd.isna(df['valid_nationality'])
-    df.loc[mask & ~emptymask & valid,'is_validnationality']=False
-    df.loc[mask & ~emptymask & valid,'nationality_issue']='Unknown nationality'
-    print(df[['nationality', 'cleaned_nationality','valid_nationality','is_validnationality','nationality_issue']])
+    df.loc[mask & ~emptymask & contains_letters,'is_validnationality']=False
+    df.loc[mask & ~emptymask & contains_letters,'nationality_issue']='Unknown nationality'
+    df.loc[~mask, 'iso_code']=df.loc[~mask,'valid_nationality'].map(iso_codes)
+    df['valid_nationality']=df['valid_nationality'].str.title()
     return df
-
 
 
 #standardize_country(df)
