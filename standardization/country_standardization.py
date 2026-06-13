@@ -77,10 +77,17 @@ country_aliases = {
     "brasil": "brazil",
     "sa": "south africa",
     "nz": "new zealand",
-    "ksa": "saudi arabia"
+    "ksa": "saudi arabia",
+    "saudi": "saudi arabia",
+    "indai":"india",
+    "jpan":"japan",
+    "chna":"china","qtr":"qatar","qatr":"qatar","omn":"oman","per":"peru",'pru':"peru",
+    "nepl":"nepal"
 }
-import pandas as pd
 
+
+import pandas as pd
+'''
 df = pd.DataFrame({
     'nationality': [
         'India',
@@ -142,18 +149,18 @@ df = pd.DataFrame({
         'Atlantis',
         'Narnia'
     ]
-})
+})'''
 
 def standardize_country(df):
     df=df.copy()
-    print(countries)
+    df['is_validnationality']=True
     emptymask=(pd.isna(df['nationality']))|(df['nationality'].str.strip()=='')
     df.loc[emptymask, 'is_validnationality']=False
     df.loc[emptymask, 'nationality_issue']='No nationality provided'
     
-    invalid=df['nationality'].str.contains(r'[a-zA-Z]',regex=True, na=False)
-    df.loc[~invalid & ~emptymask, 'is_validnationality']=False
-    df.loc[~invalid & ~emptymask, 'nationality_issue']='Invalid nationality'
+    valid=df['nationality'].str.contains(r'[a-zA-Z]',regex=True, na=False)
+    df.loc[~valid & ~emptymask, 'is_validnationality']=False
+    df.loc[~valid & ~emptymask, 'nationality_issue']='Invalid nationality'
 
     df['cleaned_nationality']=(
         df['nationality']
@@ -169,7 +176,7 @@ def standardize_country(df):
         match=process.extractOne(
             df.loc[idx, 'cleaned_nationality'],
             countries,
-            score_cutoff=79.9
+            score_cutoff=80
         )
         if match:
             df.loc[idx, 'valid_nationality']=match[0]
@@ -177,12 +184,11 @@ def standardize_country(df):
             df.loc[idx, 'valid_nationality']=np.nan
     df['valid_nationality']=df['valid_nationality'].str.title()
     mask=pd.isna(df['valid_nationality'])
-    df.loc[mask & ~emptymask & invalid,'is_validnationality']=False
-    df.loc[mask & ~emptymask & invalid,'nationality_issue']='Unknown nationality'
-    print(process.extractOne("indai", countries))
-    print(df[['nationality', 'cleaned_nationality','valid_nationality','nationality_issue']])
+    df.loc[mask & ~emptymask & valid,'is_validnationality']=False
+    df.loc[mask & ~emptymask & valid,'nationality_issue']='Unknown nationality'
+    print(df[['nationality', 'cleaned_nationality','valid_nationality','is_validnationality','nationality_issue']])
     return df
 
 
 
-standardize_country(df)
+#standardize_country(df)

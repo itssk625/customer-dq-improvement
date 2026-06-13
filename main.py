@@ -7,7 +7,7 @@ from standardization.dob_standardization import standardize_dobs
 from standardization.name_standardization import standardize_names
 from standardization.email_standardization import standardize_emails
 #from standardization.phone_standardization import standardize_phones
-#from standardization.country_standardization import standardize_country
+from standardization.country_standardization import standardize_country
 #from enrichment.email_enrichment import enrich_emails
 #from enrichment.phone_enrichment import enrich_phones
 #from enrichment.risk_scoring import score_risk
@@ -21,7 +21,7 @@ def main():
         #validation
         df=validate_names(df)
         df=validate_dobs(df)
-        #df=validate_phones(df)
+        df=validate_phones(df)
         df=validate_emails(df)
         
         #standardization
@@ -29,7 +29,7 @@ def main():
         df=standardize_dobs(df)
         #df=standardize_phones(df)
         df=standardize_emails(df)
-        #df=standardize_country(df)
+        df=standardize_country(df)
         return df
         '''
         #enrichment
@@ -63,3 +63,4 @@ if __name__=='__main__':
     print(df[['concatenated_name','is_validname','name_issue']])
     print(df[['email','valid_emails','email_issue','suggested_domain']])
     #print(df[[ "phoneno", "code","cleaned_phone","is_validphoneno","phoneno_issues"]])
+    print(df[['valid_nationality']])
