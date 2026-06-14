@@ -167,10 +167,15 @@ def validate_phones(df):
     )
     
     setcode=df['subscriber_number'].isin(country_codes)
-    df.loc[setcode,'code']
+    df.loc[setcode,'code']=df.loc[setcode,'subscriber_number']
+    df.loc[setcode, 'subscriber_number']=np.nan
+    
+
+    unknown_code = (~emptymask & ~sep_mask & ~setcode)
+    
     empty_subscriber=(pd.isna(df['subscriber_number']))|(df['subscriber_number']=='')
-    df.loc[empty_subscriber & known_code, 'is_validphoneno']=False
-    df.loc[empty_subscriber & known_code, 'phoneno_issues']+='Empty subscriber number, '
+    df.loc[empty_subscriber & ~emptymask, 'is_validphoneno']=False
+    df.loc[empty_subscriber & ~emptymask, 'phoneno_issues']+='Empty subscriber number, '
     
     is_validcodes = ((df["code"].str.len() <= 3)
     & (df["code"].str.len() > 0)
@@ -192,7 +197,7 @@ def validate_phones(df):
     df.loc[lengthmask & ~empty_subscriber, "is_validphoneno"] = False
     df.loc[lengthmask & ~empty_subscriber, "phoneno_issues"]+= "Invalid length, "
 
-    df['checked_number']=np.where(known_code, df['subscriber_number'], df['cleaned_phone'])
+    df['checked_number']=np.where(((pd.isna(df['code']))|(df['code']=='')),df['cleaned_phone'], df['subscriber_number'])
     
     allzero = df["checked_number"].str.match(r"^0+$").fillna(False)
     df.loc[~emptymask & allzero & ~empty_subscriber, "is_validphoneno"] = False
@@ -218,5 +223,5 @@ def validate_phones(df):
     df['phoneno_issues']=df['phoneno_issues'].replace('',np.nan)
     return df
 
-df=validate_phones(df)
-print(df[["phoneno", "code","subscriber_number","checked_number", "phoneno_issues"]])
+#df=validate_phones(df)
+#print(df[["phoneno", "code","subscriber_number","checked_number", "phoneno_issues"]])
