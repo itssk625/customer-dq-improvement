@@ -46,7 +46,6 @@ def enrich_emails(df):
         else:
             df.loc[idx,'email_type']='Business'
 
-    print(df[['suggested_domain','is_disposable','email_type']])
     return df
 
 

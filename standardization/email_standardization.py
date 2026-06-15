@@ -33,7 +33,6 @@ def standardize_emails(df):
     df['email_issue']=df['email_issue'].str.strip()
     df['email_issue']=df['email_issue'].str.rstrip(',')
     df['email_issue']=df['email_issue'].replace('',np.nan)
-    print(df[['email','email_issue','domain','suggested_domain']])
     return df
     
 #df=standardize_emails(df)

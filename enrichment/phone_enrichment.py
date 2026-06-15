@@ -1,3 +1,7 @@
+import pandas as pd
+import requests
+from config import API_KEY
+
 country_codes = {
     "1": "USA",
     "7": "Russia",
@@ -96,7 +100,30 @@ country_codes = {
     "976": "Mongolia",
     "977": "Nepal",
 }
+
+
+def get_operator(phone):
+    url="http://apilayer.net/api/validate"
+    params={
+        "access_key": API_KEY,
+        "number": phone
+    }
+    resp=requests.get(url, params=params)
+    return resp.json()
 def enrich_phones(df):
     df=df.copy()
-    df['extracted_country']=df['code'].map(country_codes)
+    df['extracted_country']=df['code'].map(country_codes)    
+    cache={}
+    for phone in df.loc[df['is_validphoneno'], 'valid_phone'].dropna().unique():
+        try:
+            cache[phone]=get_operator(phone)
+        except Exception as e:
+            cache[phone]={}
+        
+    for idx in df[df['is_validphoneno']].index:
+        phone=df.loc[idx, 'valid_phone']
+        df.loc[idx, "extracted_operator"]=cache.get(phone, {}).get("carrier")
+    
+        
     return df
+
