@@ -1,4 +1,4 @@
-firstname,lastname,dob,nationality,gender,email,phoneno
+first_name,last_name,dob,nationality,gender,email,phoneno
 John,Doe,1999-05-14,India,Male,john.doe@gmail.com,+91-9876543210
 Anna,Smith,2000-01-20,Canada,Female,anna.smith@outlook.com,+1-4165551234
 Ali,Khan,1998-07-30,Pakistan,Male,ali.khan@yahoo.com,+92-3001234567
@@ -20,7 +20,7 @@ John,Doe,1999-01-01,India,Male,john@gmail,+919876543210
 John,Doe,1999-01-01,India,Male,john..doe@gmail.com,+919876543210
 John,Doe,1999-01-01,India,Male,123456789@gmail.com,+919876543210
 John,Doe,1999-01-01,India,Male,asdf123@gmail.com,+919876543210
-John,Doe,1999-01-01,India,Male,.john@gmail.com,+919876543210
+John,Doe,1999-01-01,India,Male,john@google.co.uk,+919876543210
 John,Doe,1999-01-01,India,Male,john.@gmail.com,+919876543210
 John,Doe,1999-01-01,India,Male,john@gmail.com,
 John,Doe,1999-01-01,India,Male,john@gmail.com,12345

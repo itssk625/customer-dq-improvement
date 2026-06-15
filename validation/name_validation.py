@@ -19,20 +19,20 @@ def validate_names(df):
     df['is_validname']=True
     df['name_issue']=''
 
-    df['firstname']=df['firstname'].str.strip()
-    df['lastname']=df['lastname'].str.strip()
-    emptymask=(pd.isna(df['firstname'])) | (df['firstname']=='') | (pd.isna(df['lastname'])) | (df['lastname']=='')
+    df['first_name']=df['first_name'].str.strip()
+    df['last_name']=df['last_name'].str.strip()
+    emptymask=(pd.isna(df['first_name'])) | (df['first_name']=='') | (pd.isna(df['last_name'])) | (df['last_name']=='')
     df.loc[emptymask, 'is_validname']=False
     df.loc[emptymask, 'name_issue']+='Empty first or last name, '
 
     df['cleaned_firstname']=(
-        df['firstname']
+        df['first_name']
         .astype(str)
         .str.replace(r'[^a-zA-Z]','', regex=True)
     )
 
     df['cleaned_lastname']=(
-        df['lastname']
+        df['last_name']
         .astype(str)
         .str.replace(r'[^a-zA-Z]','', regex=True)
     )

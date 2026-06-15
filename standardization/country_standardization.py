@@ -214,16 +214,16 @@ df = pd.DataFrame({
 def standardize_country(df):
     df=df.copy()
     df['is_validnationality']=True
-    emptymask=(pd.isna(df['nationality']))|(df['nationality'].str.strip()=='')
+    emptymask=(pd.isna(df['country']))|(df['country'].str.strip()=='')
     df.loc[emptymask, 'is_validnationality']=False
     df.loc[emptymask, 'nationality_issue']='No nationality provided'
     
-    contains_letters=df['nationality'].str.contains(r'[a-zA-Z]',regex=True, na=False)
+    contains_letters=df['country'].str.contains(r'[a-zA-Z]',regex=True, na=False)
     df.loc[~contains_letters & ~emptymask, 'is_validnationality']=False
     df.loc[~contains_letters & ~emptymask, 'nationality_issue']='Invalid nationality'
 
     df['cleaned_nationality']=(
-        df['nationality']
+        df['country']
         .str.lower()
         .str.replace(r'[^a-z\s\']','',regex=True)
         .str.strip()

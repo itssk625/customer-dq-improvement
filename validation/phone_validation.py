@@ -144,24 +144,24 @@ def validate_phones(df):
     df['phoneno_issues']=''
     df['is_validphoneno']=True
     emptymask = (
-        pd.isna(df["phoneno"]) | (df["phoneno"].str.strip() == "")
+        pd.isna(df["phone_no"]) | (df["phone_no"].str.strip() == "")
     ).fillna(False)
     df.loc[emptymask, "is_validphoneno"] = False
     df.loc[emptymask, "phoneno_issues"]+= "Empty mobile number"
     
-    multimask = df["phoneno"].fillna("").str.split(",").str.len() > 1
-    df.loc[multimask, "phoneno"] = df.loc[multimask, "phoneno"].str.split(",").str[0]
+    multimask = df["phone_no"].fillna("").str.split(",").str.len() > 1
+    df.loc[multimask, "phone_no"] = df.loc[multimask, "phone_no"].str.split(",").str[0]
     
-    sep_mask = df["phoneno"].str.match(r"^\+?\d{1,}[\ -]").fillna(False)
+    sep_mask = df["phone_no"].str.match(r"^\+?\d{1,}[\ -]").fillna(False)
     known_code = ~emptymask & (sep_mask)
     unknown_code = (~emptymask & ~sep_mask)  
     
-    parts = df['phoneno'].str.split(r'[ -]', n=1)
+    parts = df['phone_no'].str.split(r'[ -]', n=1)
     df.loc[known_code & sep_mask, "code"] =  parts.str[0].str.replace(r'[^\d]','',regex=True)
     df.loc[known_code & sep_mask, "subscriber_number"] = parts.str[1].str.replace(' ', '')
     
     df.loc[unknown_code,'subscriber_number']=(
-        df.loc[unknown_code, 'phoneno']
+        df.loc[unknown_code, 'phone_no']
         .str.strip()
         .str.replace(r"[^0-9]", "", regex=True)
     )
@@ -187,7 +187,7 @@ def validate_phones(df):
     df.loc[unknown_code, 'phoneno_issues']+="Unknown country code, "
 
     df.loc[~emptymask, "cleaned_phone"] = (
-    df.loc[~emptymask, "phoneno"]
+    df.loc[~emptymask, "phone_no"]
     .astype(str)
     .str.strip()
     .str.replace(r"[^0-9]", "", regex=True)
