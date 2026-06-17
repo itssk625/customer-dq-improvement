@@ -31,20 +31,20 @@ known_domains=["gmail.com","outlook.com", "yahoo.com","hotmail.com","icloud.com"
 
 def enrich_emails(df):
     df=df.copy()
-    mask=(pd.isna(df['suggested_domain']))|(df['suggested_domain']=='')
-    df['is_disposable']=False
+    mask=(pd.isna(df['extracted_domain']))|(df['extracted_domain']=='')
+    df['is_disposable_email']=False
     for idx in df[~mask].index:
-        domain_parts = df.loc[idx,'suggested_domain'].split(".")
+        domain_parts = df.loc[idx,'extracted_domain'].split(".")
         for i in range(len(domain_parts)):
             if ".".join(domain_parts[i:]) in blocklist_content:
-                df.loc[idx,'is_disposable']=True
+                df.loc[idx,'is_disposable_email']=True
                 break
-    mask=(~(df['is_disposable']) & ((df['suggested_domain']).notna()) & (df['suggested_domain']!=''))
+    mask=(~(df['is_disposable_email']) & ((df['extracted_domain']).notna()) & (df['extracted_domain']!=''))
     for idx in df[mask].index:
-        if (df.loc[idx, 'suggested_domain'] in known_domains):
-            df.loc[idx,'email_type']='Personal'
+        if (df.loc[idx, 'extracted_domain'] in known_domains):
+            df.loc[idx,'email_classified_as']='Personal'
         else:
-            df.loc[idx,'email_type']='Business'
+            df.loc[idx,'email_classified_as']='Business'
 
     return df
 

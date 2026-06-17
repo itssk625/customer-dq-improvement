@@ -22,21 +22,21 @@ domain_typos_flat={
 def standardize_emails(df):
     df=df.copy()
     mask=df['is_validemail']
-    df['email_issue']=df['email_issue'].fillna('')
-    df.loc[mask,'valid_emails']=df.loc[mask,'valid_emails'].str.lower()
-    df['domain']=df['valid_emails'].str.split('@').str[1]
+    df['email_issues']=df['email_issues'].fillna('')
+    df.loc[mask,'cleaned_email']=df.loc[mask,'cleaned_email'].str.lower()
+    df['domain']=df['cleaned_email'].str.split('@').str[1]
     exactchk=df['domain'].isin(known_domains)
-    df.loc[exactchk & mask,'suggested_domain']=df.loc[exactchk & mask,'domain']
-    df.loc[~exactchk & mask, 'suggested_domain']=df.loc[~exactchk & mask,'domain'].map(domain_typos_flat)
-    unrecognized_domain=pd.isna(df['suggested_domain'])
-    df.loc[unrecognized_domain & mask,"suggested_domain"]=df.loc[unrecognized_domain & mask,"domain"] 
-    df['email_issue']=df['email_issue'].str.strip()
-    df['email_issue']=df['email_issue'].str.rstrip(',')
-    df['email_issue']=df['email_issue'].replace('',np.nan)
+    df.loc[exactchk & mask,'extracted_domain']=df.loc[exactchk & mask,'domain']
+    df.loc[~exactchk & mask, 'extracted_domain']=df.loc[~exactchk & mask,'domain'].map(domain_typos_flat)
+    unrecognized_domain=pd.isna(df['extracted_domain'])
+    df.loc[unrecognized_domain & mask,"extracted_domain"]=df.loc[unrecognized_domain & mask,"domain"] 
+    df['email_issues']=df['email_issues'].str.strip()
+    df['email_issues']=df['email_issues'].str.rstrip(',')
+    df['email_issues']=df['email_issues'].replace('',np.nan)
     return df
     
 #df=standardize_emails(df)
-#print(df[['email','email_issue','suggested_domain']])
+#print(df[['email','email_issues','extracted_domain']])
     
 
 

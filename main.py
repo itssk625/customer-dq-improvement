@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from validation.dob_validation import validate_dobs
 from validation.name_validation import validate_names
 from validation.email_validation import validate_emails
@@ -40,6 +41,8 @@ def main():
         )
         
         print(df)
+        df['extracted_country']=np.nan
+        df['extracted_operator']=np.nan
         
         #validation
         df=validate_names(df)
@@ -55,16 +58,9 @@ def main():
         df=standardize_emails(df)
         df=standardize_country(df)
         df=enrich_emails(df)
-        df=enrich_phones(df)
-       
-        
-        print(df[['dob','cleaned_dob','parsed_dob','valid_dob','is_validdob','dob_issue']])
-        print(df[['first_name','last_name','is_validname','name_issue']])
-        print(df[['email','email_issue','suggested_domain']])
-        print(df[["phone_no", "valid_phone","code","subscriber_number","phoneno_issues"]])
-        print(df[['valid_nationality','nationality_issue']])
-        
-        df=df[['record_id', 'file_id', 'concatenated_name','valid_dob', 'valid_emails','valid_phone',  'valid_nationality','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validnationality','name_issue','dob_issue', 'email_issue','phoneno_issues', 'is_disposable','email_type','suggested_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
+        #df=enrich_phones(df)
+      
+        df=df[['record_id', 'file_id', 'cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
         
         
         buffer=StringIO()
@@ -86,9 +82,10 @@ def main():
             
         )
         conn.commit()
+        
         return df
         '''
-        
+        dedup_emails_upload(df)
         df=score_risk(df)
 
         #write to cleaned customer records

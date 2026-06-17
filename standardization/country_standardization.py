@@ -146,13 +146,13 @@ country_aliases = {
 
 def standardize_country(df):
     df=df.copy()
-    df['is_validnationality']=True
+    df['is_validcountry']=True
     emptymask=(pd.isna(df['country']))|(df['country'].str.strip()=='')
-    df.loc[emptymask, 'is_validnationality']=False
+    df.loc[emptymask, 'is_validcountry']=False
     df.loc[emptymask, 'nationality_issue']='No nationality provided'
     
     contains_letters=df['country'].str.contains(r'[a-zA-Z]',regex=True, na=False)
-    df.loc[~contains_letters & ~emptymask, 'is_validnationality']=False
+    df.loc[~contains_letters & ~emptymask, 'is_validcountry']=False
     df.loc[~contains_letters & ~emptymask, 'nationality_issue']='Invalid nationality'
 
     df['cleaned_nationality']=(
@@ -162,9 +162,9 @@ def standardize_country(df):
         .str.strip()
     )
     presentmask=df['cleaned_nationality'].isin(countries)
-    df.loc[presentmask,'valid_nationality']=df.loc[presentmask,'cleaned_nationality']
-    df.loc[~presentmask, 'valid_nationality']=df['cleaned_nationality'].map(country_aliases)
-    notmatch=~(df['valid_nationality'].isin(countries))
+    df.loc[presentmask,'standardized_country']=df.loc[presentmask,'cleaned_nationality']
+    df.loc[~presentmask, 'standardized_country']=df['cleaned_nationality'].map(country_aliases)
+    notmatch=~(df['standardized_country'].isin(countries))
     for idx in df[notmatch].index:
         match=process.extractOne(
             df.loc[idx, 'cleaned_nationality'],
@@ -172,14 +172,14 @@ def standardize_country(df):
             score_cutoff=80
         )
         if match:
-            df.loc[idx, 'valid_nationality']=match[0]
+            df.loc[idx, 'standardized_country']=match[0]
         else:
-            df.loc[idx, 'valid_nationality']=np.nan
-    mask=pd.isna(df['valid_nationality'])
-    df.loc[mask & ~emptymask & contains_letters,'is_validnationality']=False
+            df.loc[idx, 'standardized_country']=np.nan
+    mask=pd.isna(df['standardized_country'])
+    df.loc[mask & ~emptymask & contains_letters,'is_validcountry']=False
     df.loc[mask & ~emptymask & contains_letters,'nationality_issue']='Unknown nationality'
-    df.loc[~mask, 'iso_code']=df.loc[~mask,'valid_nationality'].map(iso_codes)
-    df['valid_nationality']=df['valid_nationality'].str.title()
+    df.loc[~mask, 'iso_code']=df.loc[~mask,'standardized_country'].map(iso_codes)
+    df['standardized_country']=df['standardized_country'].str.title()
     return df
 
 
