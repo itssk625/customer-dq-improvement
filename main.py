@@ -38,11 +38,6 @@ def main():
                 """, f
             )
             conn.commit()
-        df=pd.read_sql_query(
-            "SELECT * FROM raw_customer_records", conn
-        )
-        
-        print(df)
         df['extracted_country']=np.nan
         df['extracted_operator']=np.nan
         
@@ -51,7 +46,6 @@ def main():
         df=validate_dobs(df)
         df=validate_phones(df)
         df=validate_emails(df)
-        
         
         #standardization
         df=standardize_names(df)
@@ -62,8 +56,7 @@ def main():
         df=enrich_emails(df)
         #df=enrich_phones(df)
       
-        df=df[['file_id', 'cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
-        
+        df=df[['cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
         
         buffer=StringIO()
         df.to_csv(buffer, index=False, header=False)
@@ -71,7 +64,7 @@ def main():
         cursor.copy_expert(
             """
             COPY cleaned_customer_records(
-                file_id, cleaned_name,
+                cleaned_name,
                 cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,
                 is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,
                 name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,
@@ -86,20 +79,16 @@ def main():
         conn.commit()
         dedup_emails(df)
         dedup_phones(df)
+        cursor.close()
+        conn.close()
         return df
+    
         '''
         
         df=score_risk(df)
 
-        #write to cleaned customer records
-
-        #deduplication
-        df=deduplicate(df)
-
         #scoring
         df=dq_scoring(df)
-
-        #write to master table
 
         #calculate report metrics
         df=calculate_reportmetrics(df)

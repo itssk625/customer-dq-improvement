@@ -83,19 +83,30 @@ def merge_emails_master(df):
             
             insert_recs.append(record)
         else:
+            master=golden_record.iloc[0].copy()
+            master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
+            changed=False
             for field in fields:
                 if field in excluded_fields:
                     continue
-                else:
+                else:   
                     if pd.notna(df.loc[idx, field]):
                         record[field]=df.loc[idx, field]
                         for f in related_fields[field]:
                             record[f]=df.loc[idx, f]
                     else:
-                        record[field]=golden_record.iloc[0][field]
+                        record[field]=master[field]
                         for f in related_fields[field]:
-                            record[f]=golden_record.iloc[0][f]
-            update_recs.append(record)
+                            record[f]=master[f]          
+                old_val=master[field]
+                new_val=record[field]
+                if (pd.isna(old_val) and pd.isna(new_val)):
+                    continue
+                if (normalize(old_val)!=normalize(new_val)):
+                    changed=True   
+
+            if (changed):     
+                update_recs.append(record)
             
     cursor=conn.cursor()
     for rec in insert_recs:
@@ -119,6 +130,7 @@ def merge_emails_master(df):
         set_clause=",".join(
             [f"{col}=%s" for col in cols]
         )
+        set_clause+= ", last_updated_timestamp=CURRENT_TIMESTAMP"
         query=f"""
         UPDATE master_customer_email SET {set_clause} WHERE cleaned_email=%s
         """
@@ -126,5 +138,6 @@ def merge_emails_master(df):
         cursor.execute(query, tuple(vals))
         
     conn.commit()     
-
+    cursor.close()
+    conn.close()
 

@@ -43,8 +43,12 @@ def dedup_phones(df):
             record={}
             for field in fields:
                 for idx in group.index:
-                    if field not in record:
+                    if field not in record and pd.notna(df.loc[idx, field]):
                         record[field]=df.loc[idx, field]
+                        for f in related_fields[field]:
+                            record[f]=df.loc[idx, f]
+                    elif field not in record and pd.isna(df.loc[idx, field]):
+                        record[field]=np.nan
                         for f in related_fields[field]:
                             record[f]=df.loc[idx, f]
             candidates.append(record)
@@ -78,6 +82,9 @@ def merge_phones_master(df):
             
             insert_recs.append(record)
         else:
+            master=golden_record.iloc[0].copy()
+            master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
+            changed=False
             for field in fields:
                 if field in excluded_fields:
                     continue
@@ -87,10 +94,18 @@ def merge_phones_master(df):
                         for f in related_fields[field]:
                             record[f]=df.loc[idx, f]
                     else:
-                        record[field]=golden_record.iloc[0][field]
+                        record[field]=master[field]
                         for f in related_fields[field]:
-                            record[f]=golden_record.iloc[0][f]
-            update_recs.append(record)
+                            record[f]=master[f]
+                old_val=master[field]
+                new_val=record[field]
+                if (pd.isna(old_val) and pd.isna(new_val)):
+                    continue
+                if (normalize(old_val)!=normalize(new_val)):
+                   
+                    changed=True
+            if (changed):
+                update_recs.append(record)
     cursor=conn.cursor()
     for rec in insert_recs:
         cols=list(rec.keys())
@@ -107,12 +122,12 @@ def merge_phones_master(df):
         cols=[
             col 
             for col in rec.keys()
-            if col!= "cleaned_phoneno"
+            if col!= "cleaned_phoneno" 
         ]
         set_clause=",".join(
             [f"{col}=%s" for col in cols]
         )
-        
+        set_clause+= ", last_updated_timestamp=CURRENT_TIMESTAMP"
         query=f"""
         UPDATE master_customer_phone SET {set_clause} WHERE cleaned_phoneno=%s
         """
@@ -121,5 +136,13 @@ def merge_phones_master(df):
         vals.append(phone)
         cursor.execute(query, tuple(vals))
     conn.commit() 
+    cursor.close()
+    conn.close()
 
-
+'''
+why timestamp updated for all when it shoudl eb done only for changed and tiemstamp should be updated
+col was not converted to list
+datetime val formats diff so treated as unequal
+normalizing 
+incorrect accessing
+removed extra cols'''
