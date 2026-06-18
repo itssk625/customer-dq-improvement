@@ -11,6 +11,8 @@ from standardization.email_standardization import standardize_emails
 from standardization.country_standardization import standardize_country
 from enrichment.email_enrichment import enrich_emails
 from enrichment.phone_enrichment import enrich_phones
+from duplicates.email_dedup import dedup_emails
+from duplicates.phone_dedup import dedup_phones
 #from enrichment.risk_scoring import score_risk
 from db.connection import get_connection
 from io import StringIO
@@ -60,7 +62,7 @@ def main():
         df=enrich_emails(df)
         #df=enrich_phones(df)
       
-        df=df[['record_id', 'file_id', 'cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
+        df=df[['file_id', 'cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
         
         
         buffer=StringIO()
@@ -69,7 +71,7 @@ def main():
         cursor.copy_expert(
             """
             COPY cleaned_customer_records(
-                record_id, file_id, cleaned_name,
+                file_id, cleaned_name,
                 cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,
                 is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,
                 name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,
@@ -82,10 +84,11 @@ def main():
             
         )
         conn.commit()
-        
+        dedup_emails(df)
+        dedup_phones(df)
         return df
         '''
-        dedup_emails_upload(df)
+        
         df=score_risk(df)
 
         #write to cleaned customer records

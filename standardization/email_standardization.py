@@ -30,6 +30,7 @@ def standardize_emails(df):
     df.loc[~exactchk & mask, 'extracted_domain']=df.loc[~exactchk & mask,'domain'].map(domain_typos_flat)
     unrecognized_domain=pd.isna(df['extracted_domain'])
     df.loc[unrecognized_domain & mask,"extracted_domain"]=df.loc[unrecognized_domain & mask,"domain"] 
+    df.loc[mask, "cleaned_email"]=df.loc[mask, "cleaned_email"].str.split("@").str[0]+"@"+df.loc[mask, "extracted_domain"]
     df['email_issues']=df['email_issues'].str.strip()
     df['email_issues']=df['email_issues'].str.rstrip(',')
     df['email_issues']=df['email_issues'].replace('',np.nan)

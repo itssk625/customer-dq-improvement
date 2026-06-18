@@ -1,26 +1,44 @@
 import pandas as pd
-
+import numpy as np
 from db.connection import get_connection
 related_fields={
-    "concatenated_name": ["is_validname","name_issue"],
-    "valid_dob":["is_validdob", "dob_issue"],
-    "valid_emails":["is_validemail", "email_issue", "is_disposable", "email_type", "suggested_domain"],
-    "valid_phone": ["is_validphoneno", "phoneno_issues", "extracted_country", "extracted_operator"],
-    "valid_nationality":["is_validnationality", "nationality_issue"],
+    "cleaned_name": ["is_validname","name_issues"],
+    "cleaned_dob":["is_validdob", "dob_issues"],
+    "cleaned_email":["is_validemail", "email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
+    "cleaned_phoneno": ["is_validphoneno", "phoneno_issues", "extracted_country", "extracted_operator"],
+    "standardized_country":["is_validcountry", "nationality_issue"],
     "gender":[]
-                
 }
-def dedup_emails_upload(df):
+excluded_fields = {
+    "file_id",
+    "record_id",
+    "is_emailduplicate",
+    "is_phone_duplicate"
+}
+
+def normalize(v):
+    if pd.isna(v):
+        return None
+    
+    if isinstance(v, np.bool_):
+        return bool(v)
+
+    if isinstance(v, np.integer):
+        return int(v)
+    if isinstance(v, np.floating):
+        return float(v)
+    return v
+
+def dedup_emails(df):
     df=df.copy()
-    duplc_emails=df['valid_emails'].duplicated(keep=False)
+    duplc_emails=df['cleaned_email'].duplicated(keep=False)
     df['is_emailduplicate']=(duplc_emails & df['is_validemail'])
-    print(df[['valid_emails','is_validemail','is_emailduplicate']])
-    emails=df['valid_emails'].dropna().unique()
+    emails=df['cleaned_email'].dropna().unique()
     candidates=[]
     #consider all the fields reqd in the master table to create
-    fields=['concatenated_name', 'valid_dob', 'valid_emails', 'valid_phone', 'valid_nationality',  'gender']
+    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for email in emails:
-        group=df[df['valid_emails']==email]
+        group=df[df['cleaned_email']==email]
         if (len(group)>1): 
             record={}
             for field in fields:
@@ -29,6 +47,11 @@ def dedup_emails_upload(df):
                         record[field]=df.loc[idx, field]
                         for f in related_fields[field]:
                             record[f]=df.loc[idx, f]
+                    elif field not in record and pd.isna(df.loc[idx, field]):
+                        record[field]=np.nan
+                        for f in related_fields[field]:
+                            record[f]=df.loc[idx, f]
+                        
             candidates.append(record)
                         
         else:
@@ -36,38 +59,72 @@ def dedup_emails_upload(df):
             record=df.loc[idx].to_dict()
             candidates.append(record)
     
-    master_candidates=pd.DataFrame(candidates)    
+    master_candidates=pd.DataFrame(candidates)  
     merge_emails_master(master_candidates)
 
 def merge_emails_master(df):
     df=df.copy()
     insert_recs=[]
     update_recs=[]
-    emails=df['valid_emails'].dropna().unique()
+    emails=df['cleaned_email'].dropna().unique()
     conn=get_connection()
-    query="""SELECT * FROM master_customer_email WHERE cleaned_email=%s"""
-    fields=['concatenated_name', 'valid_dob', 'valid_emails', 'valid_phone', 'valid_nationality',  'gender']
+    query=f"""SELECT * FROM master_customer_email WHERE cleaned_email=%s"""
+    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for email in emails:
-        group=df[df['valid_emails']==email]
+        group=df[df['cleaned_email']==email]
         golden_record=pd.read_sql_query(query, conn, params=[email])
         record={}
-        idx=group.index
+        idx=group.index[0]
         if (golden_record.empty):
-            insert_recs.extend(df.loc[idx].to_dict(orient='records'))
+            record=(
+                df.loc[idx]
+                .drop(["file_id", "is_emailduplicate", "is_corrected", "is_phone_duplicate"], errors="ignore")  
+            ).to_dict()
+            
+            insert_recs.append(record)
         else:
             for field in fields:
-                for idx in group.index:
+                if field in excluded_fields:
+                    continue
+                else:
                     if pd.notna(df.loc[idx, field]):
                         record[field]=df.loc[idx, field]
                         for f in related_fields[field]:
                             record[f]=df.loc[idx, f]
                     else:
-                        record[field]=golden_record[]
+                        record[field]=golden_record.iloc[0][field]
+                        for f in related_fields[field]:
+                            record[f]=golden_record.iloc[0][f]
             update_recs.append(record)
-                        
-    
-    
-    
-    
-    return df
+            
+    cursor=conn.cursor()
+    for rec in insert_recs:
+        cols=list(rec.keys())
+        vals=[normalize(rec[col]) for col in cols]
+        cols=",".join(cols)
+        placeholders=",".join(["%s"]*len(rec))
+        query=f"""
+        INSERT INTO master_customer_email ({cols}) values ({placeholders})
+        """
+        cursor.execute(query, tuple(vals))
+    conn.commit()
+    for rec in update_recs:
+        cols=[
+            col 
+            for col in rec.keys()
+            if col!= "cleaned_email"
+        ]
+        vals=[normalize(rec[col]) for col in cols ]
+        email=rec["cleaned_email"]
+        set_clause=",".join(
+            [f"{col}=%s" for col in cols]
+        )
+        query=f"""
+        UPDATE master_customer_email SET {set_clause} WHERE cleaned_email=%s
+        """
+        vals.append(email)
+        cursor.execute(query, tuple(vals))
+        
+    conn.commit()     
+
 
