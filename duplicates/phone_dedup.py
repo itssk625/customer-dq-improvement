@@ -33,6 +33,7 @@ def dedup_phones(df):
     df=df.copy()
     duplc_phones=df['cleaned_phoneno'].duplicated(keep=False)
     df['is_phone_duplicate']=(duplc_phones & df['is_validphoneno'])
+    
     phones=df['cleaned_phoneno'].dropna().unique()
     candidates=[]
     #consider all the fields reqd in the master table to create
@@ -43,14 +44,10 @@ def dedup_phones(df):
             record={}
             for field in fields:
                 for idx in group.index:
-                    if field not in record and pd.notna(df.loc[idx, field]):
-                        record[field]=df.loc[idx, field]
+                    if field not in record or pd.notna(df.loc[idx, field]):
+                        record[field] = df.loc[idx, field]
                         for f in related_fields[field]:
-                            record[f]=df.loc[idx, f]
-                    elif field not in record and pd.isna(df.loc[idx, field]):
-                        record[field]=np.nan
-                        for f in related_fields[field]:
-                            record[f]=df.loc[idx, f]
+                            record[f] = df.loc[idx, f]
             candidates.append(record)
                         
         else:
@@ -79,11 +76,12 @@ def merge_phones_master(df):
                 df.loc[idx]
                 .drop(['file_id', 'is_emailduplicate', 'is_phone_duplicate', 'is_corrected'], errors="ignore")
             ).to_dict()
-            
-            insert_recs.append(record)
+            if (pd.notna(record["cleaned_name"]) and pd.notna(record["cleaned_phoneno"])):
+                insert_recs.append(record)
         else:
             master=golden_record.iloc[0].copy()
-            master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
+            if (pd.notna(master["cleaned_dob"])):
+                master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
             changed=False
             for field in fields:
                 if field in excluded_fields:
@@ -93,16 +91,23 @@ def merge_phones_master(df):
                         record[field]=df.loc[idx, field]
                         for f in related_fields[field]:
                             record[f]=df.loc[idx, f]
+                               
                     else:
                         record[field]=master[field]
                         for f in related_fields[field]:
-                            record[f]=master[f]
+                            record[f]=master[f]  
+                     
                 old_val=master[field]
                 new_val=record[field]
                 if (pd.isna(old_val) and pd.isna(new_val)):
                     continue
-                if (normalize(old_val)!=normalize(new_val)):
-                   
+                elif (field=="cleaned_dob"):
+                    if (pd.notna(record["cleaned_dob"])):
+                        record["cleaned_dob"]=pd.to_datetime(record["cleaned_dob"]).strftime("%d-%m-%Y")
+                    new_val=record[field]
+                    if (old_val!=new_val):
+                        changed=True
+                elif (normalize(old_val)!=normalize(new_val)):
                     changed=True
             if (changed):
                 update_recs.append(record)
@@ -139,10 +144,3 @@ def merge_phones_master(df):
     cursor.close()
     conn.close()
 
-'''
-why timestamp updated for all when it shoudl eb done only for changed and tiemstamp should be updated
-col was not converted to list
-datetime val formats diff so treated as unequal
-normalizing 
-incorrect accessing
-removed extra cols'''

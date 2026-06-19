@@ -1,6 +1,6 @@
 first_name,last_name,dob,country,gender,email,phone_no
-John,Doe,1999-05-14,India,Male,john.doe@gmail.com,+91-9370212356
-Anna,Smith,2000-01-20,India,Female,anna.smith@outlook.com,+91-9673336751
+John,Doe,1999-05-14,,Male,john.doe@gmail.com,+91-9370212356
+Anna,Smith,2000-01-20,oman,Female,anna.smith@outlook.com,+91-9673336751
 Ali,Khan,1998-07-30,Pakistan,Male,ali.khan@yahoo.com,+92-3001234567
 Priya,Sharma,2001-09-18,India,Female,priya.sharma@gmail.com,+91-9988776655
 David,Brown,1997-11-11,United States,Male,david.brown@hotmail.com,+1-2125550000
@@ -26,7 +26,7 @@ John,Doe,1999-01-01,India,Male,john@gmail.com,
 John,Doe,1999-01-01,India,Male,john@gmail.com,12345
 John,Doe,1999-01-01,India,Male,john@gmail.com,9999999999
 John,Doe,1999-01-01,India,Male,john@gmail.com,0000000000
-John,Doe,1999-01-01,India,Male,john.doe@gmial.com,+919876543210
+John,Doe,1999-01-01,,Male,john.doe@gmial.com,+919876543210
 John,Doe,1999-01-01,India,Male,john.doe@outlok.com,+919876543210
 @@@,User,2050-01-01,Atlantis,Male,john@@gmail.com,0000000000
 Test,Qwerty,1900-01-01,Moon,Female,123456789@gmail,9999999999
