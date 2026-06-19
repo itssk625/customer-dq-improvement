@@ -13,7 +13,8 @@ from enrichment.email_enrichment import enrich_emails
 from enrichment.phone_enrichment import enrich_phones
 from duplicates.email_dedup import dedup_emails
 from duplicates.phone_dedup import dedup_phones
-#from enrichment.risk_scoring import score_risk
+from enrichment.risk_scoring import score_risk
+from scoring.dq_scoring import score_dq
 from db.connection import get_connection
 from io import StringIO
 
@@ -55,9 +56,9 @@ def main():
         df=standardize_country(df)
         df=enrich_emails(df)
         #df=enrich_phones(df)
-      
-        df=df[['cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','gender','iso_code','nationality_issue']]
-        
+        df=score_risk(df)
+        df=df[['cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','gender','iso_code','nationality_issue']]
+        df['risk_score']=df["risk_score"].astype("Int64")
         buffer=StringIO()
         df.to_csv(buffer, index=False, header=False)
         buffer.seek(0)
@@ -69,7 +70,7 @@ def main():
                 is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,
                 name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,
                 email_classified_as,extracted_domain, extracted_operator, extracted_country,
-                gender,iso_code,nationality_issue
+                risk_score,gender,iso_code,nationality_issue
             )
             FROM STDIN
             WITH CSV
@@ -77,15 +78,19 @@ def main():
             
         )
         conn.commit()
+        
         dedup_emails(df)
         dedup_phones(df)
+        
+        score_dq()
+        
         cursor.close()
         conn.close()
         return df
     
         '''
         
-        df=score_risk(df)
+        
 
         #scoring
         df=dq_scoring(df)
@@ -99,5 +104,5 @@ def main():
         
     
 if __name__=='__main__':
-    df=main()
+    main()
     
