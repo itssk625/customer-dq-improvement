@@ -16,7 +16,8 @@ from duplicates.email_dedup import dedup_emails
 from duplicates.phone_dedup import dedup_phones
 from enrichment.risk_scoring import score_risk
 from scoring.dq_scoring import score_dq
-from metrics.calculate_dashboardmetrics import calculate_metrics
+from metrics.calculate_dashboardmetrics import calculate_dashboard_metrics
+from metrics.calculate_reportmetrics import calculate_report_metrics
 from db.connection import get_connection
 from io import StringIO
 
@@ -86,22 +87,13 @@ def main():
         
         score_dq()
         
-        calculate_metrics()
+        file_id='1'
+        calculate_dashboard_metrics()
+        calculate_report_metrics(file_id)
         cursor.close()
         conn.close()
         return df
     
-        '''
-        
-        
-
-        #scoring
-        df=dq_scoring(df)
-
-        #calculate report metrics
-        df=calculate_reportmetrics(df)
-        #calculate master table metrics
-        df=calculate_dashboardmetrics(df)'''
     except Exception as e:
         print("Error:", e)
         
