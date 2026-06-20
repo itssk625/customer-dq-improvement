@@ -16,6 +16,7 @@ from duplicates.email_dedup import dedup_emails
 from duplicates.phone_dedup import dedup_phones
 from enrichment.risk_scoring import score_risk
 from scoring.dq_scoring import score_dq
+from metrics.calculate_dashboardmetrics import calculate_metrics
 from db.connection import get_connection
 from io import StringIO
 
@@ -85,6 +86,7 @@ def main():
         
         score_dq()
         
+        calculate_metrics()
         cursor.close()
         conn.close()
         return df
