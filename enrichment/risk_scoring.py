@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-fields=["email_issues", "phoneno_issues","name_issues", "dob_issues", "nationality_issue"]
 
 nationality_risks={
     "No nationality provided": 5,
@@ -95,6 +94,8 @@ def score_risk(df):
     for idx in df.index:
         score=0
         score+=email_risk(df.loc[idx, "email_issues"])
+        if (df.loc[idx, 'is_disposable_email']):
+            score=max(score,20)
         score+=phoneno_risk(df.loc[idx, "phoneno_issues"])
         score+=name_risk(df.loc[idx, "name_issues"])
         score+=dob_risk(df.loc[idx, "dob_issues"])
@@ -102,7 +103,6 @@ def score_risk(df):
         if (df.loc[idx, 'is_emailduplicate'] or df.loc[idx,'is_phoneduplicate']):
             score+=20
         df.loc[idx, "risk_score"]=int(score)
-        print(type(score))
     return df
         
         

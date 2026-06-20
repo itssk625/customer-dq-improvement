@@ -9,6 +9,7 @@ from standardization.name_standardization import standardize_names
 from standardization.email_standardization import standardize_emails
 #from standardization.phone_standardization import standardize_phones
 from standardization.country_standardization import standardize_country
+from standardization.gender_standardization import standardize_gender
 from enrichment.email_enrichment import enrich_emails
 from enrichment.phone_enrichment import enrich_phones
 from duplicates.email_dedup import dedup_emails
@@ -20,7 +21,6 @@ from io import StringIO
 
 def main():
     try:
-       
         df=pd.read_csv("./data/data.csv")
         conn=get_connection()
         cursor=conn.cursor()
@@ -54,6 +54,7 @@ def main():
         #df=standardize_phones(df)
         df=standardize_emails(df)
         df=standardize_country(df)
+        df=standardize_gender(df)
         df=enrich_emails(df)
         #df=enrich_phones(df)
         df=score_risk(df)

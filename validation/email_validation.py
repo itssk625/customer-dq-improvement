@@ -68,7 +68,7 @@ def validate_emails(df):
     df['cleaned']=(
         df['email']
         .astype(str)
-        .str.replace(r'[^a-zA-Z0-9\.@_]', '', regex=True)
+        .str.replace(r'[^a-zA-Z0-9\.@_-]', '', regex=True)
     )
     username=df['cleaned'].str.rsplit('@', n=1).str[0]
     domain=df['cleaned'].str.rsplit('@',n=1).str[1]
