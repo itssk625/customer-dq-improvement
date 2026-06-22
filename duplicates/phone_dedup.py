@@ -7,16 +7,11 @@ related_fields={
     "cleaned_dob":["is_validdob", "dob_issues"],
     "cleaned_email":["is_validemail", "email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
     "cleaned_phoneno": ["is_validphoneno", "phoneno_issues", "extracted_country", "extracted_operator"],
-    "standardized_country":["is_validcountry", "nationality_issue"],
+    "standardized_country":["is_validcountry", "nationality_issue", "iso_code"],
     "gender":[]
 }
 
-excluded_fields = {
-    "file_id",
-    "record_id",
-    "is_emailduplicate",
-    "is_phone_duplicate"
-}
+
 
 def normalize(v):
     if pd.isna(v):
@@ -31,15 +26,19 @@ def normalize(v):
 
 def dedup_phones(df):
     df=df.copy()
-    duplc_phones=df['cleaned_phoneno'].duplicated(keep=False)
-    df['is_phone_duplicate']=(duplc_phones & df['is_validphoneno'])
-    
-    phones=df['cleaned_phoneno'].dropna().unique()
+    conn=get_connection()
+    cursor=conn.cursor()
+    file_id='1'
+    duplicate_phoneno=df.loc[df['cleaned_phoneno'].duplicated(keep=False), 'cleaned_phoneno'].dropna().unique().tolist()
+    cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=FALSE where file_id=%s""",(file_id, ))
+    for phoneno in duplicate_phoneno:
+        cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=TRUE where cleaned_phoneno=%s and file_id=%s""",(phoneno,file_id))
     candidates=[]
-    #consider all the fields reqd in the master table to create
+    all_phones=df['cleaned_phoneno'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
-    for phone in phones:
+    for phone in all_phones:
         group=df[df['cleaned_phoneno']==phone]
+        #group=group.sort_values('record_id')
         if (len(group)>1): 
             record={}
             for field in fields:
@@ -56,6 +55,10 @@ def dedup_phones(df):
             candidates.append(record)
     
     master_candidates=pd.DataFrame(candidates)    
+    conn.commit()
+    cursor.close()
+    conn.close()
+    
     merge_phones_master(master_candidates)
 
 def merge_phones_master(df):
@@ -84,18 +87,15 @@ def merge_phones_master(df):
                 master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
             changed=False
             for field in fields:
-                if field in excluded_fields:
-                    continue
-                else:
-                    if pd.notna(df.loc[idx, field]):
-                        record[field]=df.loc[idx, field]
-                        for f in related_fields[field]:
-                            record[f]=df.loc[idx, f]
+                if pd.notna(df.loc[idx, field]):
+                    record[field]=df.loc[idx, field]
+                    for f in related_fields[field]:
+                        record[f]=df.loc[idx, f]
                                
-                    else:
-                        record[field]=master[field]
-                        for f in related_fields[field]:
-                            record[f]=master[f]  
+                else:
+                    record[field]=master[field]
+                    for f in related_fields[field]:
+                        record[f]=master[f]  
                      
                 old_val=master[field]
                 new_val=record[field]

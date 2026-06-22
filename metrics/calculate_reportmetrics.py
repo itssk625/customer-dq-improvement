@@ -33,10 +33,16 @@ def calculate_report_metrics(id):
     phoneno_counts=Counter(phones)
     email_duplc_counts=sum(count-1 for count in email_counts.values() if count>1)
     phoneno_duplc_counts=sum(count-1 for count in phoneno_counts.values() if count>1)
-    print(email_duplc_counts, phoneno_duplc_counts)
+    email_duplc_pct=0 if email_duplc_counts==0 else (email_duplc_counts/total)*100
+    phoneno_duplc_pct=0 if phoneno_duplc_counts==0 else (phoneno_duplc_counts/total)*100
+    df=pd.read_sql_query("select is_phone_duplicate, is_email_duplicate from cleaned_customer_records", conn)
+    duplc_pct=(((df['is_phone_duplicate']| df['is_email_duplicate']).sum())/total)*100
+    cur.execute(f"""select count(*) from cleaned_customer_records where not (is_validphoneno and is_validemail and is_validname and is_validdob and is_validcountry)""")
+    error_record_counts=cur.fetchone()[0]
+    error_record_pct=(error_record_counts/total)*100
     cur.execute(f"""insert into upload_metrics (file_id, total_records, total_valid_records, total_invalid_records, invalid_dob_pct, invalid_dob_counts, invalid_name_pct, invalid_name_counts, invalid_phoneno_pct, invalid_phoneno_counts, invalid_email_counts, invalid_email_pct, invalid_country_pct, invalid_country_counts,
-                   duplicate_phone_counts, duplicate_email_counts) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s, %s, %s)""", (id,total, total_valid, total_invalid, invalid_dob_pct, invalid_dob_counts, invalid_name_pct, invalid_name_counts,invalid_phoneno_pct,invalid_phoneno_counts, invalid_email_counts,invalid_email_pct, invalid_country_pct, invalid_country_counts,
-                   phoneno_duplc_counts, email_duplc_counts))
+                   duplicate_phone_counts, duplicate_email_counts, email_duplc_pct, phoneno_duplc_pct, error_rec_counts, error_rec_pct, duplc_pct) values (%s,%s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, %s, %s, %s, %s, %s, %s, %s)""", (id,total, total_valid, total_invalid, invalid_dob_pct, invalid_dob_counts, invalid_name_pct, invalid_name_counts,invalid_phoneno_pct,invalid_phoneno_counts, invalid_email_counts,invalid_email_pct, invalid_country_pct, invalid_country_counts,
+                   phoneno_duplc_counts, email_duplc_counts, email_duplc_pct, phoneno_duplc_pct, error_record_counts, error_record_pct, duplc_pct))
     conn.commit()
     cur.close()
     conn.close()

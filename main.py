@@ -26,6 +26,8 @@ def main():
         df=pd.read_csv("./data/data.csv")
         conn=get_connection()
         cursor=conn.cursor()
+        file_id='1'
+        df['file_id']=file_id
         with open("./data/data.csv","r") as f:
             cursor.copy_expert(
                 """
@@ -60,14 +62,15 @@ def main():
         df=enrich_emails(df)
         #df=enrich_phones(df)
         df=score_risk(df)
-        df=df[['cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','gender','iso_code','nationality_issue']]
+
+        df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','gender','iso_code','nationality_issue']]
         df['risk_score']=df["risk_score"].astype("Int64")
         buffer=StringIO()
         df.to_csv(buffer, index=False, header=False)
         buffer.seek(0)
         cursor.copy_expert(
             """
-            COPY cleaned_customer_records(
+            COPY cleaned_customer_records(file_id,
                 cleaned_name,
                 cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,
                 is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,
@@ -86,8 +89,6 @@ def main():
         dedup_phones(df)
         
         score_dq()
-        
-        file_id='1'
         calculate_dashboard_metrics()
         calculate_report_metrics(file_id)
         cursor.close()

@@ -9,12 +9,6 @@ related_fields={
     "standardized_country":["is_validcountry", "nationality_issue", "iso_code"],
     "gender":[]
 }
-excluded_fields = {
-    "file_id",
-    "record_id",
-    "is_emailduplicate",
-    "is_phone_duplicate"
-}
 
 def normalize(v):
     if pd.isna(v):
@@ -31,14 +25,19 @@ def normalize(v):
 
 def dedup_emails(df):
     df=df.copy()
-    duplc_emails=df['cleaned_email'].duplicated(keep=False)
-    df['is_emailduplicate']=(duplc_emails & df['is_validemail'])
-    
-    emails=df['cleaned_email'].dropna().unique()
+    conn=get_connection()
+    cursor=conn.cursor()
+    file_id='1'
+    duplicate_emails=df.loc[df['cleaned_email'].duplicated(keep=False), 'cleaned_email'].dropna().unique().tolist()
+    cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=FALSE where file_id=%s""",(file_id, ))
+    for email in duplicate_emails:
+        cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=TRUE where cleaned_email=%s and file_id=%s""",(email,file_id))
     candidates=[]
+    all_emails=df['cleaned_email'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
-    for email in emails:
+    for email in all_emails:
         group=df[df['cleaned_email']==email]
+        #group=group.sort_values('record_id')
         if (len(group)>1): 
             record={}
             for field in fields:
@@ -56,14 +55,18 @@ def dedup_emails(df):
             candidates.append(record)
     
     master_candidates=pd.DataFrame(candidates)  
+    conn.commit()
+    cursor.close()
+    conn.close()
     merge_emails_master(master_candidates)
 
 def merge_emails_master(df):
     df=df.copy()
     insert_recs=[]
     update_recs=[]
-    emails=df['cleaned_email'].dropna().unique()
     conn=get_connection()
+    cursor=conn.cursor()
+    emails=df['cleaned_email'].dropna().unique()
     query=f"""SELECT * FROM master_customer_email WHERE cleaned_email=%s"""
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for email in emails:
@@ -86,18 +89,15 @@ def merge_emails_master(df):
         
             changed=False
             for field in fields:
-                if field in excluded_fields:
-                    continue
-                else:   
-                    if pd.notna(df.loc[idx, field]):
-                        record[field]=df.loc[idx, field]
-                        for f in related_fields[field]:
-                            record[f]=df.loc[idx, f]
+                if pd.notna(df.loc[idx, field]):
+                    record[field]=df.loc[idx, field]
+                    for f in related_fields[field]:
+                        record[f]=df.loc[idx, f]
                                
-                    else:
-                        record[field]=master[field]
-                        for f in related_fields[field]:
-                            record[f]=master[f]  
+                else:
+                    record[field]=master[field]
+                    for f in related_fields[field]:
+                        record[f]=master[f]  
                      
                 old_val=master[field]
                 new_val=record[field]
@@ -115,7 +115,6 @@ def merge_emails_master(df):
             if (changed):     
                 update_recs.append(record)
             
-    cursor=conn.cursor()
     for rec in insert_recs:
         cols=list(rec.keys())
         vals=[normalize(rec[col]) for col in cols]
