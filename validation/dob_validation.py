@@ -11,7 +11,7 @@ def validate_dobs(df):
     emptymask=pd.isna(df['dob'])|(df['dob'].str.strip()=='')
     df.loc[emptymask,'is_validdob']=False
     df.loc[emptymask, 'dob_issues']='Empty DOB'
-    df['cleaned']=(
+    df['clean_dob']=(
             df['dob']
             .astype(str)
             .str.strip()
@@ -25,7 +25,7 @@ def validate_dobs(df):
     df['parsed_dob']=pd.NaT
     for fmt in formats:
         mask=pd.isna(df['parsed_dob'])
-        df.loc[mask,'parsed_dob']=pd.to_datetime(df['cleaned'],format= fmt,errors='coerce')
+        df.loc[mask,'parsed_dob']=pd.to_datetime(df['clean_dob'],format= fmt,errors='coerce')
                     
     invalid_date=pd.isna(df['parsed_dob']) & ~emptymask
     df.loc[invalid_date, 'is_validdob']=False

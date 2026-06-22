@@ -46,6 +46,7 @@ def main():
         df['extracted_country']=np.nan
         df['extracted_operator']=np.nan
         
+        print(df.loc[[1,16,20], 'phone_no'])
         #validation
         df=validate_names(df)
         df=validate_dobs(df)

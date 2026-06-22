@@ -100,44 +100,6 @@ country_codes = {
     "977",  # Nepal
 }
 
-df = pd.DataFrame(
-    {
-        "phoneno": [
-            "+91 9876543210",
-            "+44 20 7946 0958",
-            "12345",
-            "0000000000",
-            "1111111111",
-            "+99 1234567890",
-            "00000034203525245",
-            None,
-            "+918373849247, +98948148934",
-            "+91-0000000000",
-            "+91-9845342455",  # India
-            "+44 1234567890",  # UK
-            "91-9845342455",  # India without +
-            "44 1234567890",  # UK without +
-            "+971-501234567",  # UAE
-            "+1-2025550123",  # USA
-            "+81 9012345678",  # Japan
-            "+65-91234567",  # Singapore
-            "9845342455",  # No country code
-            "2025550123",  # Local number
-            "919845342455",  # Ambiguous continuous string
-            "971501234567",  # Ambiguous continuous string
-            "+999-123456789",  # Invalid country code
-            "999 123456789",  # Invalid country code
-            "+91",  # Country code only
-            "+91-",  # Missing phone number
-            "",  # Empty
-            None,  # Null
-            "+20 212345678",  # Egypt
-            "+977-9812345678",  # Nepal
-            "+97807-8936528058",
-        ]
-    }
-)
-
 
 def validate_phones(df):
     df=df.copy()
@@ -151,7 +113,6 @@ def validate_phones(df):
     
     multimask = df["phone_no"].fillna("").str.split(",").str.len() > 1
     df.loc[multimask, "phone_no"] = df.loc[multimask, "phone_no"].str.split(",").str[0]
-    
     sep_mask = df["phone_no"].str.match(r"^\+?\d{1,}[\ -]").fillna(False)
     known_code = ~emptymask & (sep_mask)
     unknown_code = (~emptymask & ~sep_mask)  
@@ -196,9 +157,24 @@ def validate_phones(df):
     lengthmask = ((df["cleaned"].str.len() < 8) | (df["cleaned"].str.len() > 18)) & (~emptymask)
     df.loc[lengthmask & ~empty_subscriber, "is_validphoneno"] = False
     df.loc[lengthmask & ~empty_subscriber, "phoneno_issues"]+= "Invalid length, "
-
-    df['checked_number']=np.where(((pd.isna(df['code']))|(df['code']=='')),df['cleaned'], df['subscriber_number'])
+    print(df.loc[[1,16,20], [
+        'phone_no',
+        'cleaned',
+        'code',
+        'subscriber_number'
+    ]])
     
+    df['checked_number']=np.where(((pd.isna(df['code']))|(df['code']=='')),df['cleaned'], df['subscriber_number'])
+    print(df.loc[[1,16,20], [
+    'checked_number'
+    ]])
+    df['checked_number']=(
+        df['checked_number']
+        .str.strip()
+        .str.replace(r"[^0-9]", "", regex=True)
+    )
+    
+    print(df['checked_number'])
     allzero = df["checked_number"].str.match(r"^0+$").fillna(False)
     df.loc[~emptymask & allzero & ~empty_subscriber, "is_validphoneno"] = False
     df.loc[~emptymask & allzero & ~empty_subscriber, "phoneno_issues"]+= "All zeroes phone number"

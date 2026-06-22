@@ -57,14 +57,12 @@ phoneno_risks={
 
 def email_risk(issue):
     if (pd.notna(issue)):
-        issues=[i.strip() for i in issue.split(",")]
-        return max([email_risks.get(i, 0) for i in issues], default=0)
+        return 20
     return 0
     
 def phoneno_risk(issue):
     if (pd.notna(issue)):
-        issues=[i.strip() for i in issue.split(",")]
-        return max([phoneno_risks.get(i, 0) for i in issues], default=0)
+        return 20
     return 0
     
 def name_risk(issue):
@@ -74,16 +72,14 @@ def name_risk(issue):
     return 0
     
 def dob_risk(issue):
-    s=0
     if (pd.notna(issue)):
-        return dob_risks.get(issue, 0)
-    return s
+        return 5
+    return 0
     
 def nationality_risk(issue):
-    s=0
     if (pd.notna(issue)):
-        return nationality_risks.get(issue, 0)
-    return s
+        return 5
+    return 0
     
 def score_risk(df):
     df=df.copy()

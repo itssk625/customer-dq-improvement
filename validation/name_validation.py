@@ -1,19 +1,6 @@
 import pandas as pd
 import numpy as np
 
-'''df = pd.DataFrame({
-    'firstname': [
-        'John', 'aaaaaaaaaaaaa', 'qwerty123', '', 'Abdul',
-        'prEEtI', 'Jane', 'Ali', 'Aisha', '123',
-        'Ann1a3', '', '   ', '@Robert', 'Li', None
-    ],
-    'lastname': [
-        'Smith', 'yamada', '', 'dummyy', 'Hussain',
-        'shaRMA', 'Doe', 'Khan', 'Ahmed', 'Brown',
-        'B', 'Wilson', '', 'Taylor123', 'Wu', 'Johnson'
-    ]
-})'''
-
 def validate_names(df):
     df=df.copy()
     df['is_validname']=True

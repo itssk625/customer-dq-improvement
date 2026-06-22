@@ -9,4 +9,8 @@ def standardize_names(df):
     df.loc[valid, 'cleaned_name']=df.loc[valid,'cleaned_firstname']+" "+df.loc[valid,'cleaned_lastname']
     df['cleaned_name']=df['cleaned_name'].replace('',np.nan,regex=False)
     return df
+
+import re
+
+print(bool(re.match(r"^\d+0{4,}$", "2125550000")))
     
