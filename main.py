@@ -7,7 +7,6 @@ from validation.phone_validation import validate_phones
 from standardization.dob_standardization import standardize_dobs
 from standardization.name_standardization import standardize_names
 from standardization.email_standardization import standardize_emails
-#from standardization.phone_standardization import standardize_phones
 from standardization.country_standardization import standardize_country
 from standardization.gender_standardization import standardize_gender
 from enrichment.email_enrichment import enrich_emails
@@ -46,7 +45,6 @@ def main():
         df['extracted_country']=np.nan
         df['extracted_operator']=np.nan
         
-        print(df.loc[[1,16,20], 'phone_no'])
         #validation
         df=validate_names(df)
         df=validate_dobs(df)
@@ -56,7 +54,6 @@ def main():
         #standardization
         df=standardize_names(df)
         df=standardize_dobs(df)
-        #df=standardize_phones(df)
         df=standardize_emails(df)
         df=standardize_country(df)
         df=standardize_gender(df)
@@ -86,12 +83,13 @@ def main():
         )
         conn.commit()
         
+        df=pd.read_sql_query("select file_id,record_id,cleaned_name,cleaned_dob, cleaned_email,cleaned_phoneno, standardized_country,is_validname, is_validdob, is_validemail,is_validphoneno,is_validcountry,name_issues,dob_issues, email_issues,phoneno_issues, is_disposable_email,email_classified_as,extracted_domain, extracted_operator,extracted_country,risk_score,gender,iso_code,nationality_issue from cleaned_customer_records where file_id=%s", conn, params=[file_id])
         dedup_emails(df)
         dedup_phones(df)
         
         score_dq()
-        calculate_dashboard_metrics()
-        calculate_report_metrics(file_id)
+        #calculate_dashboard_metrics()
+        #calculate_report_metrics(file_id)
         cursor.close()
         conn.close()
         return df

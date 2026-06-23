@@ -29,15 +29,15 @@ def dedup_emails(df):
     cursor=conn.cursor()
     file_id='1'
     duplicate_emails=df.loc[df['cleaned_email'].duplicated(keep=False), 'cleaned_email'].dropna().unique().tolist()
-    cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=FALSE where file_id=%s""",(file_id, ))
+    cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=FALSE where file_id=%s and is_validemail""",(file_id, ))
     for email in duplicate_emails:
-        cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=TRUE where cleaned_email=%s and file_id=%s""",(email,file_id))
+        cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=TRUE where cleaned_email=%s and file_id=%s and is_validemail""",(email,file_id))
     candidates=[]
     all_emails=df['cleaned_email'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for email in all_emails:
         group=df[df['cleaned_email']==email]
-        #group=group.sort_values('record_id')
+        group=group.sort_values('record_id')
         if (len(group)>1): 
             record={}
             for field in fields:
@@ -67,7 +67,7 @@ def merge_emails_master(df):
     conn=get_connection()
     cursor=conn.cursor()
     emails=df['cleaned_email'].dropna().unique()
-    query=f"""SELECT * FROM master_customer_email WHERE cleaned_email=%s"""
+    query=f"""SELECT * FROM final_customer_email WHERE cleaned_email=%s"""
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for email in emails:
         group=df[df['cleaned_email']==email]
@@ -77,9 +77,9 @@ def merge_emails_master(df):
         if (golden_record.empty):
             record=(
                 df.loc[idx]
-                .drop(["file_id", "is_emailduplicate", "is_corrected", "is_phone_duplicate"], errors="ignore")  
+                .drop(["file_id","record_id","risk_score", "is_emailduplicate", "is_corrected", "is_phone_duplicate"], errors="ignore")  
             ).to_dict()
-            if (pd.notna(record["cleaned_name"]) and pd.notna(record["cleaned_email"])):
+            if (pd.notna(record["cleaned_email"])):
                 insert_recs.append(record)
 
         else:
@@ -118,10 +118,12 @@ def merge_emails_master(df):
     for rec in insert_recs:
         cols=list(rec.keys())
         vals=[normalize(rec[col]) for col in cols]
+
         cols=",".join(cols)
-        placeholders=",".join(["%s"]*len(rec))
+        
+        placeholders=",".join(["%s"]*(len(rec)))
         query=f"""
-        INSERT INTO master_customer_email ({cols}) values ({placeholders})
+        INSERT INTO final_customer_email ({cols}) values ({placeholders})
         """
         cursor.execute(query, tuple(vals))
     conn.commit()
@@ -138,7 +140,7 @@ def merge_emails_master(df):
         )
         set_clause+= ", last_updated_timestamp=CURRENT_TIMESTAMP"
         query=f"""
-        UPDATE master_customer_email SET {set_clause} WHERE cleaned_email=%s
+        UPDATE final_customer_email SET {set_clause} WHERE cleaned_email=%s
         """
         vals.append(email)
         cursor.execute(query, tuple(vals))

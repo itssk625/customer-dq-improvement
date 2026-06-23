@@ -45,7 +45,7 @@ def gender_score(val):
 
 def score_dq():
     conn=get_connection()
-    df=pd.read_sql_query("SELECT cleaned_email, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, is_disposable_email, gender FROM MASTER_CUSTOMER_email", conn)
+    df=pd.read_sql_query("SELECT cleaned_email, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, is_disposable_email, gender FROM final_CUSTOMER_email", conn)
     df=df.copy()
     cursor=conn.cursor()
     for idx in df.index:
@@ -63,12 +63,12 @@ def score_dq():
         email=df.loc[idx, "cleaned_email"]
         
         query=f"""
-        UPDATE master_customer_email SET dq_score=%s WHERE cleaned_email=%s
+        UPDATE final_customer_email SET dq_score=%s WHERE cleaned_email=%s
         """
         cursor.execute(query, (int(score), email))
     conn.commit()
     
-    df=pd.read_sql_query("SELECT cleaned_phoneno, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, is_disposable_email, gender from master_customer_phone", conn)
+    df=pd.read_sql_query("SELECT cleaned_phoneno, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, is_disposable_email, gender from final_customer_phone", conn)
     df=df.copy()
     for idx in df.index:
         score=0
@@ -84,7 +84,7 @@ def score_dq():
         df.loc[idx, 'dq_score']=score
         phoneno=df.loc[idx,'cleaned_phoneno']
         query=f"""
-        UPDATE master_customer_phone set dq_score=%s where cleaned_phoneno=%s
+        UPDATE final_customer_phone set dq_score=%s where cleaned_phoneno=%s
         """
         cursor.execute(query, (int(score), phoneno))
     conn.commit()

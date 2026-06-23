@@ -113,6 +113,7 @@ def validate_phones(df):
     
     multimask = df["phone_no"].fillna("").str.split(",").str.len() > 1
     df.loc[multimask, "phone_no"] = df.loc[multimask, "phone_no"].str.split(",").str[0]
+    df["phone_no"]=df["phone_no"].str.strip()
     sep_mask = df["phone_no"].str.match(r"^\+?\d{1,}[\ -]").fillna(False)
     known_code = ~emptymask & (sep_mask)
     unknown_code = (~emptymask & ~sep_mask)  
@@ -142,10 +143,8 @@ def validate_phones(df):
     & (df["code"].str.len() > 0)
     & (df["code"].isin(country_codes))
     ).fillna(False)
-    df.loc[~is_validcodes & known_code, "is_validphoneno"] = False
-    df.loc[~is_validcodes & known_code, "phoneno_issues"]+= "Invalid country code, "
-    df.loc[unknown_code, 'is_validphoneno']=False
-    df.loc[unknown_code, 'phoneno_issues']+="Unknown country code, "
+    df.loc[(~is_validcodes & known_code) | unknown_code, "is_validphoneno"] = False
+    df.loc[(~is_validcodes & known_code) | unknown_code, "phoneno_issues"]+= "Invalid country code, "
 
     df.loc[~emptymask, "cleaned"] = (
     df.loc[~emptymask, "phone_no"]
@@ -157,24 +156,15 @@ def validate_phones(df):
     lengthmask = ((df["cleaned"].str.len() < 8) | (df["cleaned"].str.len() > 18)) & (~emptymask)
     df.loc[lengthmask & ~empty_subscriber, "is_validphoneno"] = False
     df.loc[lengthmask & ~empty_subscriber, "phoneno_issues"]+= "Invalid length, "
-    print(df.loc[[1,16,20], [
-        'phone_no',
-        'cleaned',
-        'code',
-        'subscriber_number'
-    ]])
-    
+   
     df['checked_number']=np.where(((pd.isna(df['code']))|(df['code']=='')),df['cleaned'], df['subscriber_number'])
-    print(df.loc[[1,16,20], [
-    'checked_number'
-    ]])
+  
     df['checked_number']=(
         df['checked_number']
         .str.strip()
         .str.replace(r"[^0-9]", "", regex=True)
     )
     
-    print(df['checked_number'])
     allzero = df["checked_number"].str.match(r"^0+$").fillna(False)
     df.loc[~emptymask & allzero & ~empty_subscriber, "is_validphoneno"] = False
     df.loc[~emptymask & allzero & ~empty_subscriber, "phoneno_issues"]+= "All zeroes phone number"
