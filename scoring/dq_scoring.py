@@ -2,15 +2,6 @@ import pandas as pd
 import numpy as np
 from db.connection import get_connection
 
-name_issue={
-    'Empty first or last name': 20, 
-    'Repeated letters': 5,
-    'Contains keyboard sequences': 10,
-    'Invalid name': 20,
-    'Name too short or long': 20,
-    'Contains placeholder names': 10
-}
-
 def email_score(issue):
     if(pd.isna(issue)):
         return 25
@@ -23,10 +14,8 @@ def phoneno_score(issue):
     
 def name_score(issue):
     if (pd.isna(issue)):
-        return 20
-    issues=[i.strip() for i in issue.split(",")]
-    return (20-max([name_issue.get(i, 0) for i in issues], default=0))
-
+        return 15
+    return 0
     
 def dob_score(issue):
     if (pd.isna(issue)):
@@ -35,7 +24,7 @@ def dob_score(issue):
     
 def nationality_score(issue):
     if (pd.isna(issue)):
-        return 15
+        return 20
     return 0
     
 def gender_score(val):

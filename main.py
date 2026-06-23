@@ -26,22 +26,38 @@ def main():
         conn=get_connection()
         cursor=conn.cursor()
         file_id='1'
-        df['file_id']=file_id
-        with open("./data/data.csv","r") as f:
-            cursor.copy_expert(
-                """
-                COPY raw_customer_records
-                (
-                    first_name,
-                    last_name,
-                    dob,country,gender,email,phone_no
-                    
-                )
-                FROM STDIN
-                WITH CSV HEADER;
-                """, f
+        df["file_id"]=file_id
+        df=df[["file_id",
+                "first_name",
+                "last_name",
+                "dob",
+                "country",
+                "gender",
+                "email",
+                "phone_no"]]
+        buffer = StringIO()
+        df.to_csv(buffer, index=False)
+        buffer.seek(0)
+
+        cursor.copy_expert(
+            """
+            COPY raw_customer_records
+            (
+                file_id,
+                first_name,
+                last_name,
+                dob,
+                country,
+                gender,
+                email,
+                phone_no
             )
-            conn.commit()
+            FROM STDIN
+            WITH CSV HEADER
+            """,
+            buffer
+        )
+        conn.commit()
         df['extracted_country']=np.nan
         df['extracted_operator']=np.nan
         
@@ -90,9 +106,17 @@ def main():
         score_dq()
         #calculate_dashboard_metrics()
         #calculate_report_metrics(file_id)
+        
+        query="select * from final_customer_email order by record_id"
+        df=pd.read_sql_query(query, conn)
+        df.to_csv("final_phone_table.csv", index=False)
+         
+        query="select * from final_customer_phone order by record_id"
+        df=pd.read_sql_query(query, conn)
+        df.to_csv("final_email_table.csv", index=False)
+        
         cursor.close()
         conn.close()
-        return df
     
     except Exception as e:
         print("Error:", e)

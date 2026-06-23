@@ -1,0 +1,9 @@
+record_id,cleaned_name,cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,email_classified_as,extracted_domain,extracted_operator,extracted_country,dq_score,last_updated_timestamp,gender,iso_code,nationality_issue
+1,ali khan,2005-01-12,ali.khan@yahoo.com,923001234567,Pakistan,True,True,True,True,True,,,,,False,Personal,yahoo.com,,,100,2026-06-23 15:00:03.936704,Male,PK,
+2,rohan gupta,2009-12-12,rgupta@hotmail.com,918502521785,United States,True,True,True,True,True,,,,,False,Personal,hotmail.com,,,100,2026-06-23 15:00:03.936704,Male,US,
+3,john doe,1999-05-14,john.doe@gmail.com,919370612356,India,True,True,True,True,True,,,,,False,Personal,gmail.com,,,100,2026-06-23 15:00:03.901695,Male,IN,
+4,priya sharma,2001-09-18,priya.sharma@rediffmail.com,919988776655,India,True,True,True,True,True,,,,,False,Personal,rediffmail.com,,,100,2026-06-23 15:00:03.901695,Female,IN,
+5,,1999-01-01,john@gmail.com,9719871654300,India,False,True,True,True,True,"Contains placeholder names, Repeated letters",,,,False,Personal,gmail.com,,,90,2026-06-23 15:00:03.901695,Male,IN,
+6,john doe,1999-01-01,john@gmail.com,91842270880300,Saudi Arabia,True,True,True,True,True,,,,,False,Personal,gmail.com,,,100,2026-06-23 15:00:03.901695,Male,SA,
+7,anna smith,2023-01-20,anna.smith@outlook.com,919673436751,,True,True,True,True,False,,,,,False,Personal,outlook.com,,,85,2026-06-23 15:00:03.901695,Female,,No nationality provided
+8,anna smith,,anna.smith@outlook.com,9666486013487,Oman,True,False,True,True,True,,Future DOB,,,False,Personal,outlook.com,,,85,2026-06-23 15:00:03.901695,,OM,
