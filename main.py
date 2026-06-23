@@ -72,12 +72,14 @@ def main():
         df=standardize_dobs(df)
         df=standardize_emails(df)
         df=standardize_country(df)
+        print('.')
         df=standardize_gender(df)
+        print('.')
         df=enrich_emails(df)
         #df=enrich_phones(df)
         df=score_risk(df)
 
-        df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','gender','iso_code','nationality_issue']]
+        df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','is_validname', 'is_validdob', 'is_validemail','is_validphoneno','is_validcountry','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','cleaned_gender','iso_code','nationality_issue', 'gender_issues']]
         df['risk_score']=df["risk_score"].astype("Int64")
         buffer=StringIO()
         df.to_csv(buffer, index=False, header=False)
@@ -87,10 +89,9 @@ def main():
             COPY cleaned_customer_records(file_id,
                 cleaned_name,
                 cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,
-                is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,
                 name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,
                 email_classified_as,extracted_domain, extracted_operator, extracted_country,
-                risk_score,gender,iso_code,nationality_issue
+                risk_score,gender,iso_code,nationality_issue, gender_issues
             )
             FROM STDIN
             WITH CSV
@@ -98,8 +99,8 @@ def main():
             
         )
         conn.commit()
-        
-        df=pd.read_sql_query("select file_id,record_id,cleaned_name,cleaned_dob, cleaned_email,cleaned_phoneno, standardized_country,is_validname, is_validdob, is_validemail,is_validphoneno,is_validcountry,name_issues,dob_issues, email_issues,phoneno_issues, is_disposable_email,email_classified_as,extracted_domain, extracted_operator,extracted_country,risk_score,gender,iso_code,nationality_issue from cleaned_customer_records where file_id=%s", conn, params=[file_id])
+        print('.')
+        df=pd.read_sql_query("select file_id,record_id,cleaned_name,cleaned_dob, cleaned_email,cleaned_phoneno, standardized_country,is_validname, is_validdob, is_validemail,is_validphoneno,is_validcountry,name_issues,dob_issues, email_issues,phoneno_issues, is_disposable_email,email_classified_as,extracted_domain, extracted_operator,extracted_country,risk_score,gender,iso_code,nationality_issue, gender_issues from cleaned_customer_records where file_id=%s", conn, params=[file_id])
         dedup_emails(df)
         dedup_phones(df)
         

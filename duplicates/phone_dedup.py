@@ -8,7 +8,7 @@ related_fields={
     "cleaned_email":["is_validemail", "email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
     "cleaned_phoneno": ["is_validphoneno", "phoneno_issues", "extracted_country", "extracted_operator"],
     "standardized_country":["is_validcountry", "nationality_issue", "iso_code"],
-    "gender":[]
+    "gender":['gender_issues']
 }
 
 

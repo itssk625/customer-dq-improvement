@@ -1,13 +1,13 @@
-record_id,cleaned_name,cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,email_classified_as,extracted_domain,extracted_operator,extracted_country,dq_score,last_updated_timestamp,gender,iso_code,nationality_issue
-1,ali khan,2005-01-12,ali.khan@yahoo.com,923001234567,Pakistan,True,True,True,True,True,,,,,False,Personal,yahoo.com,,,100,2026-06-23 15:00:03.535953,Male,PK,
-2,rohan gupta,2009-12-12,rg32@hotmail.com,918502521785,Oman,True,True,True,True,True,,,,,False,Personal,hotmail.com,,,100,2026-06-23 14:59:24.531073,Male,OM,
-3,john doe,1999-05-14,john.doe@yahoo.com,919370612356,India,True,True,True,True,True,,,,,False,Personal,yahoo.com,,,100,2026-06-23 15:00:03.477279,Male,IN,
-4,anna smith,2023-01-20,anna.smith@outlook.com,9666486013487,Oman,True,True,True,True,True,,,,,False,Personal,outlook.com,,,100,2026-06-23 15:00:03.477279,Female,OM,
-5,priya sharma,2001-09-18,priya.sharma@rediffmail.com,919988776655,India,True,True,True,True,True,,,,,False,Personal,rediffmail.com,,,100,2026-06-23 15:00:03.477279,Female,IN,
-6,,2023-09-18,kkk@gmail.com,,South Africa,False,True,True,False,True,"Empty first or last name, Repeated letters",,,Empty subscriber number,False,Personal,gmail.com,,,55,2026-06-23 15:00:03.477279,Male,ZA,
-7,john doe,1999-01-01,john@gmail.com,91842270880300,Saudi Arabia,True,True,True,True,True,,,,,False,Personal,gmail.com,,,100,2026-06-23 15:00:03.477279,Male,SA,
-8,john doe,1999-01-01,john.doe@gmail.com,919370612356,,True,True,True,True,False,,,,,False,Personal,gmail.com,,,85,2026-06-23 15:00:03.477279,Male,,No nationality provided
-9,rohan gupta,,rgupta@hotmail.com,918502521785,India,True,False,True,True,True,,Unrealistic age > 100 years,,,False,Personal,hotmail.com,,,85,2026-06-23 15:00:03.477279,,IN,
-10,john doe,1999-01-01,duplicate@outlook.com,,United Kingdom,True,True,True,False,True,,,,Invalid country code,False,Personal,outlook.com,,,75,2026-06-23 15:00:03.477279,Male,GB,
-11,johnny doe,1999-01-01,duplicate@servicenow.in,,China,True,True,True,False,True,,,,"Invalid country code, Invalid length",False,Business,servicenow.in,,,75,2026-06-23 15:00:03.477279,Male,CN,
-12,john doe,1999-01-01,other@gmail.com,,India,True,True,True,False,True,,,,Invalid country code,False,Personal,gmail.com,,,75,2026-06-23 15:00:03.477279,Male,IN,
+record_id,cleaned_name,cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,is_validname,is_validdob,is_validemail,is_validphoneno,is_validcountry,name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,email_classified_as,extracted_domain,extracted_operator,extracted_country,dq_score,last_updated_timestamp,gender,iso_code,nationality_issue,gender_issues
+1,john doe,1999-05-14,john.doe@yahoo.com,919370612356,India,True,True,True,True,True,,,,,False,Personal,yahoo.com,,,100,2026-06-23 17:11:07.555475,Male,IN,,
+2,anna smith,2023-01-20,anna.smith@outlook.com,9666486013487,Oman,True,True,True,True,True,,,,,False,Personal,outlook.com,,,100,2026-06-23 17:11:07.555475,Female,OM,,
+3,ali khan,,ali.khan@yahoo.com,923001234567,Pakistan,True,False,True,True,True,,Empty DOB,,,False,Personal,yahoo.com,,,90,2026-06-23 17:11:07.555475,Male,PK,,
+4,priya sharma,2001-09-18,priya.sharma@rediffmail.com,919988776655,India,True,True,True,True,True,,,,,False,Personal,rediffmail.com,,,100,2026-06-23 17:11:07.555475,Female,IN,,
+5,rohan gupta,,rg32@hotmail.com,918502521785,,True,False,True,True,False,,Unrealistic age > 100 years,,,False,Personal,hotmail.com,,,70,2026-06-23 17:11:07.555475,Male,,No nationality provided,
+6,,2023-09-18,kkk@gmail.com,,South Africa,False,True,True,False,True,"Empty first or last name, Repeated letters",,,Empty subscriber number,False,Personal,gmail.com,,,60,2026-06-23 17:11:07.555475,Male,ZA,,
+7,john doe,1999-01-01,john@gmail.com,91842270880300,Saudi Arabia,True,True,True,True,True,,,,,False,Personal,gmail.com,,,100,2026-06-23 17:11:07.555475,Male,SA,,
+8,john doe,1999-01-01,john.doe@gmail.com,919370612356,,True,True,True,True,False,,,,,False,Personal,gmail.com,,,80,2026-06-23 17:11:07.555475,Male,,No nationality provided,
+9,rohan gupta,,rgupta@hotmail.com,918502521785,India,True,False,True,True,True,,Unrealistic age > 100 years,,,False,Personal,hotmail.com,,,85,2026-06-23 17:11:07.555475,,IN,,No gender provided
+10,john doe,1999-01-01,duplicate@outlook.com,,United Kingdom,True,True,True,False,True,,,,Invalid country code,False,Personal,outlook.com,,,75,2026-06-23 17:11:07.555475,Male,GB,,
+11,johnny doe,1999-01-01,duplicate@servicenow.in,,China,True,True,True,False,True,,,,"Invalid country code, Invalid length",False,Business,servicenow.in,,,75,2026-06-23 17:11:07.555475,Male,CN,,
+12,john doe,1999-01-01,other@gmail.com,,India,True,True,True,False,True,,,,Invalid country code,False,Personal,gmail.com,,,75,2026-06-23 17:11:07.555475,Male,IN,,

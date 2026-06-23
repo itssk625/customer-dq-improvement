@@ -7,9 +7,7 @@ formats=['%d-%m-%Y','%d/%m/%Y','%Y-%m-%d','%Y/%m/%d', '%d.%m.%Y','%d-%m-%y','%d/
 
 def validate_dobs(df):
     df=df.copy()
-    df['is_validdob']=True
     emptymask=pd.isna(df['dob'])|(df['dob'].str.strip()=='')
-    df.loc[emptymask,'is_validdob']=False
     df.loc[emptymask, 'dob_issues']='Empty DOB'
     df['clean_dob']=(
             df['dob']
@@ -28,18 +26,15 @@ def validate_dobs(df):
         df.loc[mask,'parsed_dob']=pd.to_datetime(df['clean_dob'],format= fmt,errors='coerce')
                     
     invalid_date=pd.isna(df['parsed_dob']) & ~emptymask
-    df.loc[invalid_date, 'is_validdob']=False
     df.loc[invalid_date, 'dob_issues']='Invalid format or date'
 
-    future_date=(df['parsed_dob']>pd.Timestamp.today()) 
-    df.loc[future_date, 'is_validdob']=False
+    future_date=(df['parsed_dob'].notna() & df['parsed_dob']>pd.Timestamp.today()) 
     df.loc[future_date, 'dob_issues']='Future DOB'
 
-    unrealistic_age=((pd.Timestamp.today()-df['parsed_dob']).dt.days>36525)
-    df.loc[unrealistic_age, 'is_validdob']=False
+    unrealistic_age=(df['parsed_dob'].notna() & (pd.Timestamp.today()-df['parsed_dob']).dt.days>36525)
     df.loc[unrealistic_age, 'dob_issues']='Unrealistic age > 100 years'
 
-    valid_mask=df['is_validdob']
+    valid_mask=pd.isna(df['dob_issues'])
     df.loc[valid_mask,'cleaned_dob']=df['parsed_dob']
     df.loc[valid_mask,'cleaned_dob']=pd.to_datetime(df.loc[valid_mask,'cleaned_dob'],errors="coerce")
     return df
