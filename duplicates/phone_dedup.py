@@ -3,11 +3,11 @@ import numpy as np
 from db.connection import get_connection
              
 related_fields={
-    "cleaned_name": ["is_validname","name_issues"],
-    "cleaned_dob":["is_validdob", "dob_issues"],
-    "cleaned_email":["is_validemail", "email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
-    "cleaned_phoneno": ["is_validphoneno", "phoneno_issues", "extracted_country", "extracted_operator"],
-    "standardized_country":["is_validcountry", "nationality_issue", "iso_code"],
+    "cleaned_name": ["name_issues"],
+    "cleaned_dob":["dob_issues"],
+    "cleaned_email":["email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
+    "cleaned_phoneno": [ "phoneno_issues", "extracted_country", "extracted_operator"],
+    "standardized_country":["nationality_issue", "iso_code"],
     "gender":['gender_issues']
 }
 
@@ -30,9 +30,9 @@ def dedup_phones(df):
     cursor=conn.cursor()
     file_id='1'
     duplicate_phoneno=df.loc[df['cleaned_phoneno'].duplicated(keep=False), 'cleaned_phoneno'].dropna().unique().tolist()
-    cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=FALSE where file_id=%s and is_validphoneno""",(file_id, ))
+    cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=FALSE where file_id=%s and cleaned_phoneno is not null""",(file_id, ))
     for phoneno in duplicate_phoneno:
-        cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=TRUE where cleaned_phoneno=%s and file_id=%s and is_validphoneno""",(phoneno,file_id))
+        cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=TRUE where cleaned_phoneno=%s and file_id=%s and cleaned_phoneno is not null""",(phoneno,file_id))
     candidates=[]
     all_phones=df['cleaned_phoneno'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']

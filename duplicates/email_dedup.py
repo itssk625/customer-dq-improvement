@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 from db.connection import get_connection
 related_fields={
-    "cleaned_name": ["is_validname","name_issues"],
-    "cleaned_dob":["is_validdob", "dob_issues"],
-    "cleaned_email":["is_validemail", "email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
-    "cleaned_phoneno": ["is_validphoneno", "phoneno_issues", "extracted_country", "extracted_operator"],
-    "standardized_country":["is_validcountry", "nationality_issue", "iso_code"],
+    "cleaned_name": ["name_issues"],
+    "cleaned_dob":[ "dob_issues"],
+    "cleaned_email":["email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
+    "cleaned_phoneno": [ "phoneno_issues", "extracted_country", "extracted_operator"],
+    "standardized_country":["nationality_issue", "iso_code"],
     "gender":["gender_issues"]
 }
 
@@ -29,9 +29,9 @@ def dedup_emails(df):
     cursor=conn.cursor()
     file_id='1'
     duplicate_emails=df.loc[df['cleaned_email'].duplicated(keep=False), 'cleaned_email'].dropna().unique().tolist()
-    cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=FALSE where file_id=%s and is_validemail""",(file_id, ))
+    cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=FALSE where file_id=%s and cleaned_email is not null""",(file_id, ))
     for email in duplicate_emails:
-        cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=TRUE where cleaned_email=%s and file_id=%s and is_validemail""",(email,file_id))
+        cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=TRUE where cleaned_email=%s and file_id=%s and cleaned_email is not null""",(email,file_id))
     candidates=[]
     all_emails=df['cleaned_email'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']

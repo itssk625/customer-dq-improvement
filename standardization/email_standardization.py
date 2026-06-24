@@ -21,7 +21,7 @@ domain_typos_flat={
 }
 def standardize_emails(df):
     df=df.copy()
-    mask=df['is_validemail']
+    mask=pd.isna(df['email_issues'])
     df['email_issues']=df['email_issues'].fillna('')
     df.loc[mask,'cleaned_email']=df.loc[mask,'cleaned_email'].str.lower()
     df['domain']=df['cleaned_email'].str.split('@').str[1]

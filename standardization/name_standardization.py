@@ -3,7 +3,7 @@ import numpy as np
 def standardize_names(df):
     df=df.copy()
     df['cleaned_name']=''
-    valid=df['is_validname']
+    valid=pd.isna(df['name_issues'])
     df.loc[valid, 'cleaned_firstname']=df.loc[valid, 'cleaned_firstname'].str.lower()
     df.loc[valid, 'cleaned_lastname']=df.loc[valid, 'cleaned_lastname'].str.lower()
     df.loc[valid, 'cleaned_name']=df.loc[valid,'cleaned_firstname']+" "+df.loc[valid,'cleaned_lastname']

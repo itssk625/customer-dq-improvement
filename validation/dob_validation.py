@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
-#df=pd.DataFrame({'dob':[' 12a-05-1990  ','31/12/1985','    1995-07-20 ','2000/01/15','/////15.08.1988','/29-02-2001','30/02/1999','1990-13-01','1990/00/10','15-08-1880','15-08-2026',None,'abc']})
 formats=['%d-%m-%Y','%d/%m/%Y','%Y-%m-%d','%Y/%m/%d', '%d.%m.%Y','%d-%m-%y','%d/%m/%y']
 
 def validate_dobs(df):
@@ -23,12 +22,13 @@ def validate_dobs(df):
     df['parsed_dob']=pd.NaT
     for fmt in formats:
         mask=pd.isna(df['parsed_dob'])
-        df.loc[mask,'parsed_dob']=pd.to_datetime(df['clean_dob'],format= fmt,errors='coerce')
+        parsed=pd.to_datetime(df.loc[mask,'clean_dob'],format= fmt,errors='coerce')
+        df.loc[mask, 'parsed_dob']=parsed
                     
-    invalid_date=pd.isna(df['parsed_dob']) & ~emptymask
+    invalid_date=(pd.isna(df['parsed_dob']) & (~emptymask))
     df.loc[invalid_date, 'dob_issues']='Invalid format or date'
 
-    future_date=(df['parsed_dob'].notna() & df['parsed_dob']>pd.Timestamp.today()) 
+    future_date=(df['parsed_dob'].notna()) & (df['parsed_dob']>pd.Timestamp.today()) 
     df.loc[future_date, 'dob_issues']='Future DOB'
 
     unrealistic_age=(df['parsed_dob'].notna() & (pd.Timestamp.today()-df['parsed_dob']).dt.days>36525)
@@ -39,5 +39,3 @@ def validate_dobs(df):
     df.loc[valid_mask,'cleaned_dob']=pd.to_datetime(df.loc[valid_mask,'cleaned_dob'],errors="coerce")
     return df
 
-#df=validate_dobs(df)
-#print(df[['dob','cleaned_dob','parsed_dob','cleaned_dob','is_validdob','dob_issues']])

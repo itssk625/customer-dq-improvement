@@ -1,5 +1,4 @@
 import pandas as pd
-import pycountry
 import numpy as np
 from rapidfuzz import process
 countries = [
@@ -146,13 +145,10 @@ country_aliases = {
 
 def standardize_country(df):
     df=df.copy()
-    df['is_validcountry']=True
     emptymask=(pd.isna(df['country']))|(df['country'].str.strip()=='')
-    df.loc[emptymask, 'is_validcountry']=False
     df.loc[emptymask, 'nationality_issue']='No nationality provided'
     
     contains_letters=df['country'].str.contains(r'[a-zA-Z]',regex=True, na=False)
-    df.loc[~contains_letters & ~emptymask, 'is_validcountry']=False
     df.loc[~contains_letters & ~emptymask, 'nationality_issue']='Invalid nationality'
 
     df['cleaned_nationality']=(
@@ -176,7 +172,6 @@ def standardize_country(df):
         else:
             df.loc[idx, 'standardized_country']=np.nan
     mask=pd.isna(df['standardized_country'])
-    df.loc[mask & ~emptymask & contains_letters,'is_validcountry']=False
     df.loc[mask & ~emptymask & contains_letters,'nationality_issue']='Unknown nationality'
     df.loc[~mask, 'iso_code']=df.loc[~mask,'standardized_country'].map(iso_codes)
     df['standardized_country']=df['standardized_country'].str.title()

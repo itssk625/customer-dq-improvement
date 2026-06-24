@@ -21,6 +21,5 @@ def standardize_gender(df):
     mask=df['cleaned_gender'].notna()
     df.loc[mask, 'cleaned_gender']=df.loc[mask, 'cleaned_gender'].str.title()
     df.loc[~mask & ~emptymask, 'gender_issues']='Invalid gender'
-    print(df[['gender','cleaned_gender','gender_issues']])
     return df
 

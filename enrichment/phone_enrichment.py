@@ -114,13 +114,14 @@ def enrich_phones(df):
     df=df.copy()
     df['extracted_country']=df['code'].map(country_codes)    
     cache={}
-    for phone in df.loc[df['is_validphoneno'], 'cleaned_phoneno'].dropna().unique():
+    mask=pd.isna(df['phoneno_issues'])
+    for phone in df.loc[mask, 'cleaned_phoneno'].dropna().unique():
         try:
             cache[phone]=get_operator(phone)
         except Exception as e:
             cache[phone]={}
         
-    for idx in df[df['is_validphoneno']].index:
+    for idx in df.loc[mask, 'cleaned_phoneno'].index:
         phone=df.loc[idx, 'cleaned_phoneno']
         df.loc[idx, "extracted_operator"]=cache.get(phone, {}).get("carrier")
     

@@ -29,9 +29,9 @@ def nationality_risk(issue):
 def score_risk(df):
     df=df.copy()
     duplc_emails=df['cleaned_email'].duplicated(keep=False)
-    df['is_emailduplicate']=(duplc_emails & df['is_validemail'])
+    df['is_emailduplicate']=(duplc_emails & df['cleaned_email'].notna())
     duplc_phones=df['cleaned_phoneno'].duplicated(keep=False)
-    df['is_phoneduplicate']=(duplc_phones & df['is_validphoneno'])
+    df['is_phoneduplicate']=(duplc_phones & df['cleaned_phoneno'].notna())
     for idx in df.index:
         score=0
         score+=email_risk(df.loc[idx, "email_issues"])

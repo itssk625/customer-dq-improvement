@@ -17,7 +17,6 @@ def enrich_emails(df):
                 df.loc[idx,'is_disposable_email']=True
                 break
     disposable_invalid=df['is_disposable_email']
-    df.loc[disposable_invalid, 'is_validemail']=False
     df.loc[disposable_invalid, 'email_issues']+='Disposable email'
     mask=(~(df['is_disposable_email']) & ((df['extracted_domain']).notna()) & (df['extracted_domain']!=''))
     for idx in df[mask].index:
