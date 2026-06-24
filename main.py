@@ -24,8 +24,8 @@ import streamlit as st
 def main():
     st.title("Customer DQ Improvement")
     st.title("App working!")
-    '''
-        try:
+    try:
+        '''
         df=pd.read_csv("./data/data.csv")
         conn=get_connection()
         cursor=conn.cursor()
