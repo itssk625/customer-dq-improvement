@@ -18,6 +18,8 @@ from scoring.dq_scoring import score_dq
 from metrics.calculate_metrics import calculate_metrics
 from db.connection import get_connection
 from io import StringIO
+import streamlit as st
+
 
 def main():
     try:
@@ -104,6 +106,9 @@ def main():
         dedup_phones(df)
         
         score_dq()
+        
+        st.title("Customer DQ Improvement")
+        st.title("App working!")
         #calculate_metrics()
         
         
