@@ -24,7 +24,8 @@ import streamlit as st
 def main():
     st.title("Customer DQ Improvement")
     st.title("App working!")
-    try:
+    '''
+        try:
         df=pd.read_csv("./data/data.csv")
         conn=get_connection()
         cursor=conn.cursor()
@@ -114,6 +115,7 @@ def main():
         
         cursor.close()
         conn.close()
+        '''
     
     except Exception as e:
         st.error(f"Error: {e}")
