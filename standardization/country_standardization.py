@@ -177,5 +177,3 @@ def standardize_country(df):
     df['standardized_country']=df['standardized_country'].str.title()
     return df
 
-
-#standardize_country(df)

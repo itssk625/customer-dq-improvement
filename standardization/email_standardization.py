@@ -36,10 +36,6 @@ def standardize_emails(df):
     df['email_issues']=df['email_issues'].replace('',np.nan)
     return df
     
-#df=standardize_emails(df)
-#print(df[['email','email_issues','extracted_domain']])
-    
-
 
 
 

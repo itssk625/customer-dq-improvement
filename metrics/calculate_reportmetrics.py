@@ -6,7 +6,7 @@ def calculate_report_metrics(id):
     cur=conn.cursor()
     cur.execute(f"""select count(*) from cleaned_customer_records where file_id=%s""",(id,))
     total=cur.fetchone()[0]
-    cur.execute(f"""select count(*) from cleaned_customer_records where file_id=%s and is_validname and (is_validphoneno or is_validemail)""",(id,))
+    cur.execute(f"""select count(*) from cleaned_customer_records where file_id=%s and cleaned_name is  and (is_validphoneno or is_validemail)""",(id,))
     total_valid=cur.fetchone()[0]
     total_invalid=total-total_valid
     cur.execute(f"""select count(*) from cleaned_customer_records where file_id=%s and not is_validdob""",(id,))

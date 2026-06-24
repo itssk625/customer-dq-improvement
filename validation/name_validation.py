@@ -67,6 +67,3 @@ def validate_names(df):
     df.loc[valid_mask, 'valid_lastname']=df.loc[valid_mask, 'cleaned_lastname']
     
     return df
-
-#df=validate_names(df)
-#print(df[['firstname','lastname','valid_firstname', 'valid_lastname','is_validname','name_issues']])

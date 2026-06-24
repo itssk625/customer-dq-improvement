@@ -1,43 +1,6 @@
 import pandas as pd
 import numpy as np
 
-df=pd.DataFrame({'email':['john.doe@example.com',
-        'jane.doe@example.com',
-        'ali.khan@example.com',
-        'aisha.ahmed@example.com',
-        '123@example.com',
-        'ann1a3@example.com',
-        '131413452@example.com',
-        '@example.com',
-        'john.doe@',
-        'john.doe@@example.com',
-        'john.doe@.com',
-        '',                         # Empty + No @
-    '@',                        # Empty username + Empty domain
-    '@.com',                    # Empty username + Invalid domain
-    'ab@.com',                  # Username too short + Invalid domain
-    '12@.com',                  # Username too short + Invalid domain + numeric
-    '12345@',                   # Empty domain + Numeric username
-    '123456789@example.com',    # Numeric username + Excessive numeric content
-    'ab@example.com',           # Username too short
-    'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz@example.com',  # Username too long
-    '12345678@example.com',     # Numeric username + Excessive numeric content
-    'john@@@example.com',       # Multiple @ (before cleaning)
-    'john@com',                 # Domain missing dot
-    'john@.com',                # Domain starts with dot
-    'john@henry@gmail.',              # Domain ends with dot
-    '@gmail.com',
-    'john@',
-    'john@doe@gmail.com',
-    'johndoe@@gmail.com',
-    'john.gmail.com',
-    '.joh@gmail.com',
-    'john.@gmail.com',
-    '12ab345678@example.com',   # Excessive numeric content
-    '___@example.com',          # Weird username but passes many checks
-    '111111111@example.com',
-    '13asdf4@example.com']})
-
 def validate_emails(df):
     df=df.copy()
     df['email_issues']=''

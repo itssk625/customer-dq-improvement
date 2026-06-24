@@ -6,13 +6,13 @@ def calculate_dashboard_metrics():
     cursor=conn.cursor()
     cursor.execute(f"""select count(*) from master_customer_email""", conn)
     total=cursor.fetchone()[0]
-    cursor.execute(f"""select count(*) from master_customer_email where not is_validdob""", conn)
+    cursor.execute(f"""select count(*) from master_customer_email where cleaned_dob is null""", conn)
     invalid_dob_counts=cursor.fetchone()[0]
     invalid_dob_pct=0 if (total==0) else  (invalid_dob_counts/total)*100
-    cursor.execute(f"""select count(*) from master_customer_email where not is_validphoneno""", conn)
+    cursor.execute(f"""select count(*) from master_customer_email where cleaned_phoneno is null""", conn)
     invalid_phoneno_counts=cursor.fetchone()[0]
     invalid_phoneno_pct=0 if (total==0) else (invalid_phoneno_counts/total)*100
-    query=f"""SELECT count(*) FROM master_customer_email where not is_validcountry;"""
+    query=f"""SELECT count(*) FROM master_customer_email where  standardized_country is null;"""
     cursor.execute(query, conn)
     invalid_country_counts = cursor.fetchone()[0]
     invalid_country_pct=0 if (total==0) else  (invalid_country_counts/total)*100
@@ -24,13 +24,13 @@ def calculate_dashboard_metrics():
 
     cursor.execute(f"""select count(*) from master_customer_phone""", conn)
     total=cursor.fetchone()[0]
-    cursor.execute(f"""select count(*) from master_customer_phone where not is_validdob""", conn)
+    cursor.execute(f"""select count(*) from master_customer_phone where cleaned_dob is null""", conn)
     invalid_dob_counts=cursor.fetchone()[0]
     invalid_dob_pct= 0 if (total==0) else (invalid_dob_counts/total)*100
-    cursor.execute(f"""select count(*) from master_customer_phone where not is_validemail""", conn)
+    cursor.execute(f"""select count(*) from master_customer_phone where cleaned_email is null""", conn)
     invalid_email_counts=cursor.fetchone()[0]
     invalid_email_pct= 0 if (total==0) else (invalid_email_counts/total)*100
-    query=f"""SELECT count(*) FROM master_customer_phone where not is_validcountry;"""
+    query=f"""SELECT count(*) FROM master_customer_phone where standardized_country is null;"""
     cursor.execute(query, conn)
     invalid_country_counts = cursor.fetchone()[0]
     invalid_country_pct= 0 if (total==0) else (invalid_country_counts/total)*100

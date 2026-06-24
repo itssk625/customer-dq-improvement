@@ -15,8 +15,7 @@ from duplicates.email_dedup import dedup_emails
 from duplicates.phone_dedup import dedup_phones
 from enrichment.risk_scoring import score_risk
 from scoring.dq_scoring import score_dq
-from metrics.calculate_dashboardmetrics import calculate_dashboard_metrics
-from metrics.calculate_reportmetrics import calculate_report_metrics
+from metrics.calculate_metrics import calculate_metrics
 from db.connection import get_connection
 from io import StringIO
 
@@ -105,16 +104,8 @@ def main():
         dedup_phones(df)
         
         score_dq()
-        #calculate_dashboard_metrics()
-        #calculate_report_metrics(file_id)
+        #calculate_metrics()
         
-        query="select * from final_customer_email order by record_id"
-        df=pd.read_sql_query(query, conn)
-        df.to_csv("final_phone_table.csv", index=False)
-         
-        query="select * from final_customer_phone order by record_id"
-        df=pd.read_sql_query(query, conn)
-        df.to_csv("final_email_table.csv", index=False)
         
         cursor.close()
         conn.close()

@@ -180,5 +180,3 @@ def validate_phones(df):
     
     return df
 
-#df=validate_phones(df)
-#print(df[["phoneno", "code","subscriber_number","checked_number", "phoneno_issues"]])
