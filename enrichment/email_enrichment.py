@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-with open('../disposable_email_blocklist.conf') as blocklist:
+with open('disposable_email_blocklist.conf') as blocklist:
     blocklist_content = {line.rstrip() for line in blocklist.readlines()}
 
 known_domains={"gmail.com","outlook.com", "yahoo.com","hotmail.com","icloud.com","rediffmail.com","zoho.com","protonmail.com","msn.com"}
