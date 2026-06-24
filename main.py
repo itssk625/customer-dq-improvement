@@ -22,6 +22,8 @@ import streamlit as st
 
 
 def main():
+    st.title("Customer DQ Improvement")
+    st.title("App working!")
     try:
         df=pd.read_csv("./data/data.csv")
         conn=get_connection()
@@ -107,8 +109,6 @@ def main():
         
         score_dq()
         
-        st.title("Customer DQ Improvement")
-        st.title("App working!")
         #calculate_metrics()
         
         
@@ -116,7 +116,8 @@ def main():
         conn.close()
     
     except Exception as e:
-        print("Error:", e)
+        st.error(f"Error: {e}")
+        raise
         
     
 if __name__=='__main__':
