@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+rapidfuzz
+python-dotenv
+psycopg2-binary
+pycountry
+requests

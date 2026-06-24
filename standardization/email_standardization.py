@@ -1,5 +1,4 @@
 import pandas as pd
-from rapidfuzz import process
 import numpy as np
 
 known_domains=["gmail.com","outlook.com", "yahoo.com","hotmail.com","icloud.com","rediffmail.com","zoho.com","protonmail.com","msn.com"]
