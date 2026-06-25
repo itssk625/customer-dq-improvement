@@ -4,7 +4,7 @@ from db.connection import get_connection
 related_fields={
     "cleaned_name": ["name_issues"],
     "cleaned_dob":[ "dob_issues"],
-    "cleaned_email":["email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
+    "cleaned_email":["email_issues", "email_classified_as", "extracted_domain"],
     "cleaned_phoneno": [ "phoneno_issues", "extracted_country", "extracted_operator"],
     "standardized_country":["nationality_issue", "iso_code"],
     "gender":["gender_issues"]
@@ -28,10 +28,6 @@ def dedup_emails(df):
     conn=get_connection()
     cursor=conn.cursor()
     file_id='1'
-    duplicate_emails=df.loc[df['cleaned_email'].duplicated(keep=False), 'cleaned_email'].dropna().unique().tolist()
-    cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=FALSE where file_id=%s and cleaned_email is not null""",(file_id, ))
-    for email in duplicate_emails:
-        cursor.execute(f"""update cleaned_customer_records set is_email_duplicate=TRUE where cleaned_email=%s and file_id=%s and cleaned_email is not null""",(email,file_id))
     candidates=[]
     all_emails=df['cleaned_email'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
@@ -77,7 +73,7 @@ def merge_emails_master(df):
         if (golden_record.empty):
             record=(
                 df.loc[idx]
-                .drop(["file_id","record_id","risk_score", "is_emailduplicate", "is_corrected", "is_phone_duplicate"], errors="ignore")  
+                .drop(["file_id","record_id","risk_score", "is_emailduplicate", "is_corrected", "is_disposable_email","is_phone_duplicate"], errors="ignore")  
             ).to_dict()
             if (pd.notna(record["cleaned_email"])):
                 insert_recs.append(record)

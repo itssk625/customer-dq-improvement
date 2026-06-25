@@ -5,29 +5,31 @@ def validate_names(df):
     df=df.copy()
     df['name_issues']=''
 
-    df['first_name']=df['first_name'].str.strip()
-    df['last_name']=df['last_name'].str.strip()
-    emptymask=(pd.isna(df['first_name'])) | (df['first_name']=='') | (pd.isna(df['last_name'])) | (df['last_name']=='')
-    df.loc[emptymask, 'name_issues']+='Empty first or last name, '
+    df['first_name']=df['first_name'].fillna('').str.strip()
+    df['last_name']=df['last_name'].fillna('').str.strip()
+    
+    emptyfullname=((df['first_name']=='') & (df['last_name']==''))
+    df.loc[emptyfullname, 'name_issues']= 'Empty full name'
+    empty=((df['first_name']=='') ^ (df['last_name']==''))
+    df.loc[empty, 'name_issues']+='Empty first or last name, '
 
+    emptymask= (emptyfullname) | (empty)
     df['cleaned_firstname']=(
         df['first_name']
-        .fillna('')
         .astype(str)
         .str.replace(r'[^a-zA-Z]','', regex=True)
     )
 
     df['cleaned_lastname']=(
         df['last_name']
-        .fillna('')
         .astype(str)
         .str.replace(r'[^a-zA-Z]','', regex=True)
     )
     invalidmask=((df['cleaned_firstname']=='') | (df['cleaned_lastname']==''))
-    df.loc[invalidmask, 'name_issues']+='Invalid name, '
+    df.loc[invalidmask & ~emptymask, 'name_issues']+='Invalid name, '
 
     invalidlength=(((df['cleaned_firstname'].str.len()<3) | (df['cleaned_lastname'].str.len()<3) | (df['cleaned_firstname'].str.len()>50) | (df['cleaned_lastname'].str.len()>50))) 
-    df.loc[invalidlength, 'name_issues']+='Name too short or long, '
+    df.loc[invalidlength & ~emptymask & ~invalidmask, 'name_issues']+='Name too short or long, '
     
     
     placeholder_names=[
@@ -42,7 +44,7 @@ def validate_names(df):
 
     pattern=('|').join(placeholder_names)
     contains_placeholder=((df['cleaned_firstname'].str.contains(pattern, case=False, regex=True, na=False))|(df['cleaned_lastname'].str.contains(pattern, case=False, regex=True, na=False))) 
-    df.loc[contains_placeholder, 'name_issues']+='Contains placeholder names, '
+    df.loc[contains_placeholder & ~emptymask, 'name_issues']+='Contains placeholder names, '
     
     keyboard_sequences=[
         'qwerty',
@@ -55,10 +57,10 @@ def validate_names(df):
 
     pattern=('|').join(keyboard_sequences)
     contains_keyboardseq=((df['cleaned_firstname'].str.contains(pattern, case=False,na=False, regex=True))|df['cleaned_lastname'].str.contains(pattern, case=False, na=False,regex=True))
-    df.loc[contains_keyboardseq, 'name_issues']+='Contains keyboard sequences, '
+    df.loc[contains_keyboardseq & ~emptymask, 'name_issues']+='Contains keyboard sequences, '
 
     repletters=((df['cleaned_firstname'].str.match(r'.*([a-zA-Z])\1{4,}.*').fillna(False))|(df['cleaned_lastname'].str.match(r'.*([a-zA-Z])\1{4,}.*')).fillna(False)) 
-    df.loc[repletters, 'name_issues']+='Repeated letters'
+    df.loc[repletters & ~emptymask, 'name_issues']+='Repeated letters'
     df['name_issues']=df['name_issues'].str.strip()
     df['name_issues']=df['name_issues'].str.replace(r',$','',regex=True)
     df['name_issues'] = df['name_issues'].replace('', np.nan)

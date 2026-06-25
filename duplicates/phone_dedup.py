@@ -5,7 +5,7 @@ from db.connection import get_connection
 related_fields={
     "cleaned_name": ["name_issues"],
     "cleaned_dob":["dob_issues"],
-    "cleaned_email":["email_issues", "is_disposable_email", "email_classified_as", "extracted_domain"],
+    "cleaned_email":["email_issues", "is_disposable_email","email_classified_as", "extracted_domain"],
     "cleaned_phoneno": [ "phoneno_issues", "extracted_country", "extracted_operator"],
     "standardized_country":["nationality_issue", "iso_code"],
     "gender":['gender_issues']
@@ -29,10 +29,6 @@ def dedup_phones(df):
     conn=get_connection()
     cursor=conn.cursor()
     file_id='1'
-    duplicate_phoneno=df.loc[df['cleaned_phoneno'].duplicated(keep=False), 'cleaned_phoneno'].dropna().unique().tolist()
-    cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=FALSE where file_id=%s and cleaned_phoneno is not null""",(file_id, ))
-    for phoneno in duplicate_phoneno:
-        cursor.execute(f"""update cleaned_customer_records set is_phone_duplicate=TRUE where cleaned_phoneno=%s and file_id=%s and cleaned_phoneno is not null""",(phoneno,file_id))
     candidates=[]
     all_phones=df['cleaned_phoneno'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']

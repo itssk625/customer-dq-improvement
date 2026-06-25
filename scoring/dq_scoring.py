@@ -34,15 +34,12 @@ def gender_score(val):
 
 def score_dq():
     conn=get_connection()
-    df=pd.read_sql_query("SELECT cleaned_email, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, is_disposable_email, gender FROM final_CUSTOMER_email", conn)
+    df=pd.read_sql_query("SELECT cleaned_email, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, gender FROM final_CUSTOMER_email", conn)
     df=df.copy()
     cursor=conn.cursor()
     for idx in df.index:
         score=0
         score+=email_score(df.loc[idx, "email_issues"])
-        if (df.loc[idx, 'is_disposable_email']):
-            if (score==25):
-                score-=10
         score+=phoneno_score(df.loc[idx, 'phoneno_issues'])
         score+=name_score(df.loc[idx, "name_issues"])
         score+=dob_score(df.loc[idx, 'dob_issues'])

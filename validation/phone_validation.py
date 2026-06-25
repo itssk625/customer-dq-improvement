@@ -116,7 +116,7 @@ def validate_phones(df):
     known_code = ~emptymask & (sep_mask)
     unknown_code = (~emptymask & ~sep_mask)  
     
-    parts = df['phone_no'].str.split(r'[ -]', n=1)
+    parts = df['phone_no'].str.split(r'[\s-]+', n=1)
     df.loc[known_code & sep_mask, "code"] =  parts.str[0].str.replace(r'[^\d]','',regex=True)
     df.loc[known_code & sep_mask, "subscriber_number"] = parts.str[1].str.replace(' ', '')
     
@@ -140,7 +140,8 @@ def validate_phones(df):
     & (df["code"].str.len() > 0)
     & (df["code"].isin(country_codes))
     ).fillna(False)
-    df.loc[(~is_validcodes & known_code) | unknown_code, "phoneno_issues"]+= "Invalid country code, "
+    df.loc[(~is_validcodes & known_code) , "phoneno_issues"]+= "Invalid country code, "
+    df.loc[unknown_code, "phoneno_issues"]+= "Country code not extractable, "
 
     df.loc[~emptymask, "cleaned"] = (
     df.loc[~emptymask, "phone_no"]

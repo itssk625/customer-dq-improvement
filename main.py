@@ -82,7 +82,7 @@ def main():
         #df=enrich_phones(df)
         df=score_risk(df)
 
-        df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','name_issues','dob_issues', 'email_issues','phoneno_issues', 'is_disposable_email','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','cleaned_gender','iso_code','nationality_issue', 'gender_issues']]
+        df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','name_issues','dob_issues', 'email_issues','phoneno_issues','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','cleaned_gender','iso_code','nationality_issue', 'gender_issues','is_disposable_email']]
         df['risk_score']=df["risk_score"].astype("Int64")
         buffer=StringIO()
         df.to_csv(buffer, index=False, header=False)
@@ -92,9 +92,9 @@ def main():
             COPY cleaned_customer_records(file_id,
                 cleaned_name,
                 cleaned_dob,cleaned_email,cleaned_phoneno,standardized_country,
-                name_issues,dob_issues,email_issues,phoneno_issues,is_disposable_email,
+                name_issues,dob_issues,email_issues,phoneno_issues,
                 email_classified_as,extracted_domain, extracted_operator, extracted_country,
-                risk_score,gender,iso_code,nationality_issue, gender_issues
+                risk_score,gender,iso_code,nationality_issue, gender_issues, is_disposable_email
             )
             FROM STDIN
             WITH CSV

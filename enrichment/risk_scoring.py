@@ -25,6 +25,11 @@ def nationality_risk(issue):
     if (pd.notna(issue)):
         return 24
     return 0
+
+def gender_risk(issue):
+    if (pd.notna(issue)):
+        return 14
+    return 0
     
 def score_risk(df):
     df=df.copy()
@@ -39,6 +44,7 @@ def score_risk(df):
         score+=name_risk(df.loc[idx, "name_issues"])
         score+=dob_risk(df.loc[idx, "dob_issues"])
         score+=nationality_risk(df.loc[idx, "nationality_issue"])
+        score+=gender_risk(df.loc[idx, 'gender_issues'])
         if (df.loc[idx, 'is_emailduplicate'] or df.loc[idx,'is_phoneduplicate']):
             score+=10
         df.loc[idx, "risk_score"]=int(score)
