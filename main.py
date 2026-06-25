@@ -23,7 +23,7 @@ import streamlit as st
 
 def main():
     st.title("Customer DQ Improvement")
-    st.title("App working!")
+    st.write("App working!")
     try:
         df=pd.read_csv("./data/data.csv")
         conn=get_connection()
@@ -108,7 +108,7 @@ def main():
         dedup_phones(df)
         
         score_dq()
-        
+        st.write("Completed!")
         #calculate_metrics()
         
         
