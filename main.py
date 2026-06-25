@@ -17,6 +17,7 @@ from enrichment.risk_scoring import score_risk
 from scoring.dq_scoring import score_dq
 from metrics.calculate_dashboardmetrics import calculate_dashboard_metrics
 from db.connection import get_connection
+from metrics.report import display_report
 from io import StringIO
 import streamlit as st
 import uuid
@@ -113,19 +114,12 @@ def main():
                     score_dq()
                     calculate_dashboard_metrics()
                     report=pd.read_sql_query(
-                    """select * from metrics where repo_type=%s order by snapshot_timestamp desc limit 1""", conn, params=["email"]
+                    """select * from metrics order by snapshot_timestamp desc limit 2""", conn
                     )
                     st.success("Processing completed successfully!")
-                    st.subheader("DQ Report")
                     st.dataframe(report)
-                    metrics=report.to_csv(index=False)
-                    st.download_button(
-                        "Download Report",
-                        metrics,
-                        file_name="metrics_report.csv",
-                        mime="text/csv"
-                    
-                    )
+                    display_report(report)
+
                     st.subheader("Email identified golden records")
                     golden_email=pd.read_sql_query("""select * from final_customer_email""", conn)
                     st.dataframe(golden_email)
