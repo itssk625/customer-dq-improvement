@@ -53,7 +53,7 @@ def display_metrics(rec):
         circ_progress("DOB", rec["valid_dob_count"], total)
     with col3:
         if rec["repo_type"]=="email":
-            circ_progress("Phone number", rec["valid_phone_count"], total)
+            circ_progress("Phone number", rec["valid_phoneno_count"], total)
         else:
             circ_progress("Email", rec["valid_email_count"], total)
     
