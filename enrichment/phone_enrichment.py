@@ -1,6 +1,6 @@
 import pandas as pd
 import requests
-from config import API_KEY
+import streamlit as st
 
 country_codes = {
     "1": "USA",
@@ -105,7 +105,7 @@ country_codes = {
 def get_operator(phone):
     url="http://apilayer.net/api/validate"
     params={
-        "access_key": API_KEY,
+        "access_key": st.secrets["API_KEY"],
         "number": phone
     }
     resp=requests.get(url, params=params)
