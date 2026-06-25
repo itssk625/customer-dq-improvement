@@ -24,7 +24,6 @@ import uuid
 
 def main():
     st.title("Customer DQ Improvement")
-    st.write("App working!")
     try:
         uploaded_file=st.file_uploader("Upload CSV", type=["csv"])
         if uploaded_file:
@@ -73,7 +72,6 @@ def main():
                     df=validate_names(df)
 
                     df=validate_dobs(df)
-                    print('.')
 
                     df=validate_phones(df)
                     df=validate_emails(df)
@@ -113,12 +111,11 @@ def main():
                     dedup_phones(df)
                     
                     score_dq()
-                    st.write("Completed!")
                     calculate_dashboard_metrics()
                     report=pd.read_sql_query(
                     """select * from metrics where repo_type=%s order by snapshot_timestamp desc limit 1""", conn, params=["email"]
                     )
-                    st.success("Processing completed sucessfully!")
+                    st.success("Processing completed successfully!")
                     st.header("DQ Report")
                     st.dataframe(report)
                     csv=report.to_csv(index=False)
@@ -128,7 +125,6 @@ def main():
                         file_name="metrics_report.csv",
                         mime="text/csv"
                     )
-                    
                     
                     cursor.close()
                     conn.close()
