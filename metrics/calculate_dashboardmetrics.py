@@ -19,7 +19,7 @@ def calculate_dashboard_metrics():
     valid_gender_counts=cursor.fetchone()[0]
     cursor.execute(f"""select avg(dq_score) from final_customer_email""", conn)
     dq_avg=cursor.fetchone()[0]
-    cursor.execute(f"""insert into dashboard_metrics (repo_type,total_records, valid_name_count, valid_dob_count, valid_phoneno_count, valid_country_count, valid_gender_count,
+    cursor.execute(f"""insert into metrics (repo_type,total_records, valid_name_count, valid_dob_count, valid_phoneno_count, valid_country_count, valid_gender_count,
                    average_dq_score) values (%s,%s,%s,%s, %s, %s, %s, %s)""", ("email",total, valid_name_counts, valid_dob_counts,valid_phoneno_counts, valid_country_counts, valid_gender_counts,dq_avg))
     conn.commit()
     cursor.close()
