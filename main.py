@@ -116,19 +116,30 @@ def main():
                     """select * from metrics where repo_type=%s order by snapshot_timestamp desc limit 1""", conn, params=["email"]
                     )
                     st.success("Processing completed successfully!")
-                    st.header("DQ Report")
+                    st.subheader("DQ Report")
                     st.dataframe(report)
-                    csv=report.to_csv(index=False)
+                    metrics=report.to_csv(index=False)
                     st.download_button(
                         "Download Report",
-                        csv,
+                        metrics,
                         file_name="metrics_report.csv",
                         mime="text/csv"
-                    )
                     
+                    )
+                    st.subheader("Email identified golden records")
+                    golden_email=pd.read_sql_query("""select * from final_customer_email""", conn)
+                    st.dataframe(golden_email)
+                    golden_rec_email=golden_email.to_csv(index=False)
+                    st.download_button("Download final email table", golden_rec_email, file_name="golden_recs_email.csv",
+                        mime="text/csv")
+                    st.subheader("Phone identified golden records")
+                    golden_phone=pd.read_sql_query("""select * from final_customer_phone""", conn)
+                    st.dataframe(golden_phone)
+                    golden_rec_phone=golden_phone.to_csv(index=False)
+                    st.download_button("Download final phone table", golden_rec_phone, file_name="golden_recs_phone.csv",
+                        mime="text/csv")
                     cursor.close()
                     conn.close()
-                    
             
     
     except Exception as e:
