@@ -30,8 +30,6 @@ def main():
         st.session_state.report=None
     if "downloads" not in st.session_state:
         st.session_state.downloads={}
-    if "page" not in st.session_state:
-        st.session_state.page="upload"
     st.title("Customer DQ Improvement")
     page=st.segmented_control(
         "Navigation", ["Upload","Dashboard"],
@@ -40,7 +38,7 @@ def main():
     st.divider()
             
     try:
-        if page=="upload":
+        if page=="Upload":
             if st.button("Open dashboard"):
                 st.session_state.page="dashboard"
                 st.rerun()
@@ -157,7 +155,7 @@ def main():
                 st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
                     mime="text/csv")
         
-        elif page=="dashboard":
+        elif page=="Dashboard":
             conn=get_connection()
             dashboard=pd.read_sql_query(
                 """select * from metrics order by snapshot_timestamp desc""", conn
