@@ -40,7 +40,7 @@ def circ_progress(title, valid_count, total):
         """,
         unsafe_allow_html=True,
     )
-    st.plotly_chart(fig, config={"displayModeBar": False})
+    st.plotly_chart(fig, config={"displayModeBar": False}, key=title)
     st.markdown(
         f"""
         <div style="
