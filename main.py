@@ -136,13 +136,10 @@ def main():
         if st.session_state.processed:
             display_report(st.session_state.report)
             st.subheader("Downloads")
-            col1, col2=st.columns(2)
-            with col1:
-                st.download_button("Download final email table", st.session_state.downloads["golden_rec_email"], file_name="golden_recs_email.csv",
-                    mime="text/csv")
-            with col2:
-                st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
-                    mime="text/csv")
+            st.download_button("Download final email table", st.session_state.downloads["golden_rec_email"], file_name="golden_recs_email.csv",
+                mime="text/csv")
+            st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
+                mime="text/csv")
                 
             
     

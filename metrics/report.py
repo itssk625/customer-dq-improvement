@@ -97,7 +97,7 @@ def display_metrics(rec):
                     font-size:20px;
                     font-weight:700;
                     font-family: Arial, sans-serif;
-                    line-height:1,2;
+                    line-height:1.2;
                 ">
                     {rec["total_records"]}
                 </div>
@@ -125,7 +125,7 @@ def display_metrics(rec):
                     font-size:20px;
                     font-weight:700;
                     font-family: Arial, sans-serif;
-                    line-height:1,2;
+                    line-height:1.2;
                 ">
                     {round(rec["average_dq_score"],2)}
                 </div>
@@ -155,7 +155,7 @@ def display_metrics(rec):
                     font-size:20px;
                     font-weight:700;
                     font-family: Arial, sans-serif;
-                    line-height:1,2;
+                    line-height:1.2;
                 ">
                     {rec['disposable_email_pct']}
                 </div>
