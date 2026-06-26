@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-def circ_progress(title, valid_count, total):
+def circ_progress(title, valid_count, total, repo_type):
     pct=0 if valid_count==0 else round((valid_count/total)*100,2)
     fig=go.Figure(
         go.Pie(
@@ -40,7 +40,7 @@ def circ_progress(title, valid_count, total):
         """,
         unsafe_allow_html=True,
     )
-    st.plotly_chart(fig, config={"displayModeBar": False}, key=title)
+    st.plotly_chart(fig, config={"displayModeBar": False}, key=f"{repo_type}_{title}")
     st.markdown(
         f"""
         <div style="
@@ -67,20 +67,20 @@ def display_metrics(rec):
     
     col1, col2, col3=st.columns(3)
     with col1:
-        circ_progress("Name", rec["valid_name_count"],total)
+        circ_progress("Name", rec["valid_name_count"],total,rec["repo_type"])
     with col2:
-        circ_progress("DOB", rec["valid_dob_count"], total)
+        circ_progress("DOB", rec["valid_dob_count"], total,rec["repo_type"])
     with col3:
         if rec["repo_type"]=="email":
-            circ_progress("Phone number", rec["valid_phoneno_count"], total)
+            circ_progress("Phone number", rec["valid_phoneno_count"], total,rec["repo_type"])
         else:
-            circ_progress("Email", rec["valid_email_count"], total)
+            circ_progress("Email", rec["valid_email_count"], total,rec["repo_type"])
     
     col1, col2=st.columns(2)
     with col1:
-        circ_progress("Country", rec["valid_country_count"], total)
+        circ_progress("Country", rec["valid_country_count"], total,rec["repo_type"])
     with col2:
-        circ_progress("Gender", rec["valid_gender_count"], total)
+        circ_progress("Gender", rec["valid_gender_count"], total,rec["repo_type"])
         
     st.divider()
     
