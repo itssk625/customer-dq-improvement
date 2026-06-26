@@ -4,10 +4,6 @@ from db.connection import get_connection
 def display_dashboard():
     st.title("Dashboard")
     conn=get_connection()
-    dashboard=pd.read_sql_query(
-        """select * from metrics order by snapshot_timestamp desc""", conn
-    )
-    st.dataframe(dashboard)
     months=pd.read_sql_query(
         """
         select distinct 
@@ -16,21 +12,31 @@ def display_dashboard():
         order by month desc
         """, conn     
     )
-    repo=st.selectbox(
+    
+    col1, col2=st.columns(2)
+    with col1:
+        repo=st.selectbox(
         "Repository",["email","phone"]
-    )
-    month=st.selectbox(
-        "Month", months["month"]
-    )
+        )
+    
+    with col2:
+        month=st.selectbox(
+            "Month", months["month"], format_func=lambda x: x.strftime("%B %Y")
+        )
     
     dashboard=pd.read_sql_query(
         """
         select * from metrics
-        where repo_type=%s and date_trunc('month', snapshot_timestamp)=DATE_TRUNC('month',%s::timestamp)
+        where repo_type=%s and date_trunc('month', snapshot_timestamp)=%s
         order by snapshot_timestamp desc
         limit 1
         """, conn, params=[repo, month]
     )
+    
+    if dashboard.empty:
+        st.warning("No metrics available for selected month.")
+        return 
+    
     rec=dashboard.iloc[0]
     col1, col2, col3=st.columns(3)
     with col1:
@@ -40,12 +46,12 @@ def display_dashboard():
     with col2:
         st.metric(
             "Average DQ",
-            round(rec["avergae_dq_score"],2)
+            round(rec["average_dq_score"],2)
         )
     with col3:
         if repo=="phone":
             st.metric(
                 "Disposable Emails",
-                f"{rec["disposable_email_pct"]:.2f}%"
+                f"{rec['disposable_email_pct']:.2f}%"
             )
     conn.close()
