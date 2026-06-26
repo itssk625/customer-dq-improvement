@@ -145,9 +145,9 @@ def main():
             if st.session_state.processed:
                 st.divider()
                 st.subheader("Email identified records")
-                st.dataframe(st.session_state.downloads["golden_email"])
+                st.dataframe(st.session_state.downloads["golden_email"].head(20))
                 st.subheader("Phone identified records")
-                st.dataframe(st.session_state.downloads["golden_phone"])
+                st.dataframe(st.session_state.downloads["golden_phone"].head(20))
                 display_report(st.session_state.report)
                                    
                 st.subheader("Downloads")
@@ -162,6 +162,7 @@ def main():
                 """select * from metrics order by snapshot_timestamp desc""", conn
             )
             st.dataframe(dashboard)
+            conn.close()
 
     except Exception as e:
         st.error(f"Error: {e}")
