@@ -182,5 +182,6 @@ def display_report(report_df):
     if not email_repo.empty:
             display_metrics(email_repo)
     if not phone_repo.empty:
+            st.divider()
             display_metrics(phone_repo)
     st.divider()
