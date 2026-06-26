@@ -29,7 +29,7 @@ def circ_progress(title, valid_count, total):
                 "size":15
             }
         },
-        margin=dict(l=5, r=5, t=40, b=5),
+        margin=dict(l=5, r=5, t=65, b=20),
         height=240,
         width=240
     )
