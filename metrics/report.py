@@ -6,9 +6,9 @@ def circ_progress(title, valid_count, total):
     fig=go.Figure(
         go.Pie(
             values=[pct, 100-pct],
-            hole=.82,
+            hole=.88,
             marker=dict(
-                colors=["#22c55e", "#930808"]
+                colors=["#22c55e", "#d1d5db"]
             ),
             textinfo="none",
             showlegend=False
@@ -19,12 +19,15 @@ def circ_progress(title, valid_count, total):
             dict(
                 text=f"<b>{pct}%</b>",
                 x=.5, y=.5,
-                showarrow=False, font=dict(size=24)
+                showarrow=False, font=dict(size=15, family="Arial Black")
             )
         ],
         title={
-            "text": title,
-            "x":.5
+            "text": f"<b>{title}</b>",
+            "x": .5,
+            "font":{
+                "size":15
+            }
         },
         margin=dict(l=5, r=5, t=40, b=5),
         height=220
@@ -36,7 +39,19 @@ def circ_progress(title, valid_count, total):
         config={"displayModeBar":False}
     )
     
-    st.caption(f"{valid_count:,}/{total:,} Valid")
+    st.markdown(
+        f"""
+        <div style="
+        text-align;center;
+        font-size=17px;
+        color: #bfbfbf;
+        margin-top: -8px;
+        ">
+        {valid_count}/{total} Valid
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
 def display_metrics(rec):
     
