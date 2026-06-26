@@ -51,7 +51,7 @@ def circ_progress(title, valid_count, total, repo_type):
             margin-top:-14px;
             margin-bottom:8px;
         ">
-        {valid_count}/{total} Valid
+        {int(valid_count)}/{total} Valid
         </div>
         """,
         unsafe_allow_html=True
@@ -109,7 +109,7 @@ def display_metrics(rec):
                     font-family: Arial, sans-serif;
                     line-height:1.2;
                 ">
-                    {rec["total_records"]}
+                    {int(rec["total_records"])}
                 </div>
             </div>
         """,
