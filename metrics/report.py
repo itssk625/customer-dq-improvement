@@ -106,7 +106,7 @@ def display_metrics(rec):
         )
         
     with col2:
-        st.metric(st.markdown(
+        st.markdown(
             f"""
             <div style="text-align:center;"
             padding-top:5px;
@@ -131,7 +131,7 @@ def display_metrics(rec):
         """,
         unsafe_allow_html=True,
         )
-        )
+        
     
     with col3:
         if (rec["repo_type"]=="phone"):
