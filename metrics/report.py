@@ -82,19 +82,19 @@ def display_metrics(rec):
         st.markdown(
             f"""
             <div style="text-align:center;">
-            <div style="
-            font-size: 15px;
-            color:#bfbfbf;
-            font-weight:500;">
-            Total Records
+                <div style="
+                    font-size: 15px;
+                    color:#bfbfbf;
+                    font-weight:500;">
+                    Total Records
+                </div>
+                </div style="
+                    font-size:36px;
+                    font-weight:700;
+                    margin-top:4px;">
+                    {rec["total_records"]}
+                </div>
             </div>
-            </div style="
-            font-size:36px;
-            font-weight:700;
-            margin-top:4px;">
-            {rec["total_records"]}
-            </div>
-        </div>
         """,
         unsafe_allow_html=True,
         )
