@@ -33,7 +33,7 @@ def circ_progress(title, valid_count, total, repo_type):
             font-size:16px;
             font-weight:600;
             color:#e5e7eb;
-            margin-bottom:4px;
+            margin-bottom:-4px;
             margin-top:4px
         ">
             {title}
