@@ -89,7 +89,7 @@ def display_metrics(rec):
                     Total Records
                 </div>
                 </div style="
-                    font-size:36px;
+                    font-size:20px;
                     font-weight:700;
                     margin-top:4px;">
                     {rec["total_records"]}
