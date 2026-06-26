@@ -33,7 +33,8 @@ def circ_progress(title, valid_count, total, repo_type):
             font-size:16px;
             font-weight:600;
             color:#e5e7eb;
-            margin-bottom:8px;
+            margin-bottom:4px;
+            margin-top:4px
         ">
             {title}
         </div>
@@ -145,6 +146,7 @@ def display_metrics(rec):
     
     with col3:
         if (rec["repo_type"]=="phone"):
+            st.divider()
             st.markdown(
             f"""
             <div style="
