@@ -64,6 +64,7 @@ def display_metrics(rec):
     if (rec["repo_type"]=="email"):
         st.subheader("Metrics for email identified records")
     else:
+        st.divider()
         st.subheader("Metrics for phone identified records")
     
     col1, col2, col3=st.columns(3)
@@ -146,7 +147,6 @@ def display_metrics(rec):
     
     with col3:
         if (rec["repo_type"]=="phone"):
-            st.divider()
             st.markdown(
             f"""
             <div style="
