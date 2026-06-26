@@ -22,16 +22,13 @@ def circ_progress(title, valid_count, total):
                 showarrow=False, font=dict(size=15, family="Arial Black")
             )
         ],
-        title={
-            "text": f"<b>{title}</b>",
-            "x": .5,
-            "font":{
-                "size":15
-            }
-        },
+        title=dict(
+            text=f"<b>{title}</b>",
+            x=.5, xanchor="center", y=.98,
+            yanchor="top", font=dict(size=16, family="Arial", color="e5e7eb"),
         margin=dict(l=5, r=5, t=65, b=20),
         height=240,
-        width=240
+        width=240)
     )
     
     st.plotly_chart(fig)
