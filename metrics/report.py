@@ -22,7 +22,7 @@ def circ_progress(title, valid_count, total, repo_type):
                 showarrow=False, font=dict(size=15, family="Arial Black")
             )
         ],
-        margin=dict(l=5, r=5, t=65, b=20),
+        margin=dict(l=5, r=5, t=20, b=20),
         height=240,
         width=240
     )
