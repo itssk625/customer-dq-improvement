@@ -15,9 +15,10 @@ from duplicates.email_dedup import dedup_emails
 from duplicates.phone_dedup import dedup_phones
 from enrichment.risk_scoring import score_risk
 from scoring.dq_scoring import score_dq
-from metrics.calculate_dashboardmetrics import calculate_dashboard_metrics
+from metrics.calculate_metrics import calculate_metrics
 from db.connection import get_connection
 from metrics.report import display_report
+from metrics.dashboard import display_dashboard
 from io import StringIO
 import streamlit as st
 import uuid
@@ -35,7 +36,6 @@ def main():
         "", ["Upload","Dashboard"],
         default="Upload"
     )
-    st.divider()
             
     try:
         if page=="Upload":
@@ -124,7 +124,7 @@ def main():
                     dedup_phones(df)
                     
                     score_dq()
-                    calculate_dashboard_metrics()
+                    calculate_metrics()
                     report=pd.read_sql_query(
                     """select distinct on (repo_type) * from metrics order by repo_type, snapshot_timestamp desc""", conn
                     )
@@ -157,12 +157,7 @@ def main():
                     mime="text/csv")
         
         elif page=="Dashboard":
-            conn=get_connection()
-            dashboard=pd.read_sql_query(
-                """select * from metrics order by snapshot_timestamp desc""", conn
-            )
-            st.dataframe(dashboard)
-            conn.close()
+            display_dashboard()
 
     except Exception as e:
         st.error(f"Error: {e}")

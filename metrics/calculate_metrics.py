@@ -1,7 +1,7 @@
 import pandas as pd
 from db.connection import get_connection
 
-def calculate_dashboard_metrics():
+def calculate_metrics():
     conn=get_connection()
     cursor=conn.cursor()
     cursor.execute(f"""select count(*) from final_customer_email""")
