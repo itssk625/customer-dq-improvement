@@ -32,7 +32,7 @@ def main():
         st.session_state.downloads={}
     st.title("Customer DQ Improvement")
     page=st.segmented_control(
-        "Navigation", ["Upload","Dashboard"],
+        "", ["Upload","Dashboard"],
         default="Upload"
     )
     st.divider()
@@ -145,9 +145,9 @@ def main():
             if st.session_state.processed:
                 st.divider()
                 st.subheader("Email identified records")
-                st.dataframe(st.session_state.downloads["golden_email"].head(20))
+                st.dataframe(st.session_state.downloads["golden_email"].head(10))
                 st.subheader("Phone identified records")
-                st.dataframe(st.session_state.downloads["golden_phone"].head(20))
+                st.dataframe(st.session_state.downloads["golden_phone"].head(10))
                 display_report(st.session_state.report)
                                    
                 st.subheader("Downloads")

@@ -62,10 +62,10 @@ def display_metrics(rec):
     
     total=rec["total_records"]
     if (rec["repo_type"]=="email"):
-        st.subheader("Metrics for email identified records")
+        st.subheader("Metrics for email identified records", text_alignment="center")
     else:
         st.write()
-        st.subheader("Metrics for phone identified records")
+        st.subheader("Metrics for phone identified records", text_alignment="center")
     
     col1, col2, col3=st.columns(3)
     with col1:
@@ -176,7 +176,7 @@ def display_metrics(rec):
         
     
 def display_report(report_df):
-    st.subheader("Customer Data Quality Report")
+    st.subheader("Customer Data Quality Report", text_alignment="center")
     email_repo=report_df.query("repo_type=='email'")
     phone_repo=report_df.query("repo_type=='phone'")
     if not email_repo.empty:
