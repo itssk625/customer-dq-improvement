@@ -177,11 +177,11 @@ def display_metrics(rec):
     
 def display_report(report_df):
     st.subheader("Customer Data Quality Report")
-    email_repo=report_df.query("repo_type=='email'").iloc[0]
-    phone_repo=report_df.query("repo_type=='phone'").iloc[0]
+    email_repo=report_df.query("repo_type=='email'")
+    phone_repo=report_df.query("repo_type=='phone'")
     if not email_repo.empty:
-            display_metrics(email_repo)
+            display_metrics(email_repo.iloc[0])
     if not phone_repo.empty:
             st.divider()
-            display_metrics(phone_repo)
+            display_metrics(phone_repo.iloc[0])
     st.divider()
