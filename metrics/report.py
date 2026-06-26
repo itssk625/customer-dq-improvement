@@ -81,17 +81,23 @@ def display_metrics(rec):
     with col1:
         st.markdown(
             f"""
-            <div style="text-align:center;">
+            <div style="text-align:center;"
+            padding-top:5px;
+            >
                 <div style="
                     font-size: 15px;
                     color:#bfbfbf;
-                    font-weight:500;">
+                    font-weight:500;
+                    font-family:Arial, sans-serif;
+                ">
                     Total Records
                 </div>
                 </div style="
                     font-size:20px;
                     font-weight:700;
-                    margin-top:4px;">
+                    font-family: Arial, sans-serif;
+                    line-height:1,2;
+                ">
                     {rec["total_records"]}
                 </div>
             </div>
@@ -100,12 +106,61 @@ def display_metrics(rec):
         )
         
     with col2:
-        st.metric("Average DQ score", round(rec["average_dq_score"],2))
+        st.metric(st.markdown(
+            f"""
+            <div style="text-align:center;"
+            padding-top:5px;
+            >
+                <div style="
+                    font-size: 15px;
+                    color:#bfbfbf;
+                    font-weight:500;
+                    font-family:Arial, sans-serif;
+                ">
+                    Average DQ score 
+                </div>
+                </div style="
+                    font-size:20px;
+                    font-weight:700;
+                    font-family: Arial, sans-serif;
+                    line-height:1,2;
+                ">
+                    {round(rec["average_dq_score"],2)}
+                </div>
+            </div>
+        """,
+        unsafe_allow_html=True,
+        )
+        )
     
     with col3:
         if (rec["repo_type"]=="phone"):
-            st.metric("Disposable Emails",
-                      f"{rec['disposable_email_pct']:.2f}%")   
+            st.markdown(
+            f"""
+            <div style="text-align:center;"
+            padding-top:5px;
+            >
+                <div style="
+                    font-size: 15px;
+                    color:#bfbfbf;
+                    font-weight:500;
+                    font-family:Arial, sans-serif;
+                ">
+                    Disposable Emails
+                </div>
+                </div style="
+                    font-size:20px;
+                    font-weight:700;
+                    font-family: Arial, sans-serif;
+                    line-height:1,2;
+                ">
+                    {rec['disposable_email_pct']}
+                </div>
+            </div>
+        """,
+        unsafe_allow_html=True,
+        )
+        
     
 def display_report(report_df):
     st.subheader("DQ Report")
