@@ -22,29 +22,40 @@ def circ_progress(title, valid_count, total):
                 showarrow=False, font=dict(size=15, family="Arial Black")
             )
         ],
-        title=dict(
-            text=f"<b>{title}</b>",
-            x=.5, xanchor="center", y=.98,
-            yanchor="top", font=dict(size=16, family="Arial", color="e5e7eb"),
         margin=dict(l=5, r=5, t=65, b=20),
         height=240,
-        width=240)
+        width=240
     )
-    
-    st.plotly_chart(fig)
     st.markdown(
         f"""
         <div style="
-        text-align:center;
-        font-size:17px;
-        color: #bfbfbf;
-        margin-top:-16px;
+            text-align:center;
+            font-size:16px;
+            font-weight:600;
+            color:#e5e7eb;
+            margin-bottom:8px;
+        ">
+            {title}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.plotly_chart(fig, config={"displayModeBar": False})
+    st.markdown(
+        f"""
+        <div style="
+            text-align:center;
+            font-size:17px;
+            color: #bfbfbf;
+            margin-top:-14px;
+            margin-bottom:8px;
         ">
         {valid_count}/{total} Valid
         </div>
         """,
         unsafe_allow_html=True
     )
+    
     
 def display_metrics(rec):
     
@@ -154,7 +165,7 @@ def display_metrics(rec):
                     font-family: Arial, sans-serif;
                     line-height:1.2;
                 ">
-                    {rec['disposable_email_pct']}
+                    {rec['disposable_email_pct']:.2f}%
                 </div>
             </div>
         """,
