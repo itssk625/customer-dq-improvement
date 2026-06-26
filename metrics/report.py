@@ -38,10 +38,10 @@ def circ_progress(title, valid_count, total):
     st.markdown(
         f"""
         <div style="
-        text-align;center;
-        font-size=17px;
+        text-align:center;
+        font-size:17px;
         color: #bfbfbf;
-        margin-top: -8px;
+        margin-top:-16px;
         ">
         {valid_count}/{total} Valid
         </div>
@@ -81,9 +81,10 @@ def display_metrics(rec):
     with col1:
         st.markdown(
             f"""
-            <div style="text-align:center;"
+            <div style="
+            text-align:center;
             padding-top:5px;
-            >
+            ">
                 <div style="
                     font-size: 15px;
                     color:#bfbfbf;
@@ -108,9 +109,10 @@ def display_metrics(rec):
     with col2:
         st.markdown(
             f"""
-            <div style="text-align:center;"
+            <div style="
+            text-align:center;
             padding-top:5px;
-            >
+            ">
                 <div style="
                     font-size: 15px;
                     color:#bfbfbf;
@@ -137,9 +139,10 @@ def display_metrics(rec):
         if (rec["repo_type"]=="phone"):
             st.markdown(
             f"""
-            <div style="text-align:center;"
+            <div style="
+            text-align:center;
             padding-top:5px;
-            >
+            ">
                 <div style="
                     font-size: 15px;
                     color:#bfbfbf;
