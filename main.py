@@ -39,9 +39,6 @@ def main():
             
     try:
         if page=="Upload":
-            if st.button("Open dashboard"):
-                st.session_state.page="dashboard"
-                st.rerun()
             uploaded_file=st.file_uploader("Upload CSV", type=["csv"])
             if uploaded_file and st.button("Process file"):
                 file_id=str(uuid.uuid4())
@@ -136,6 +133,8 @@ def main():
                     golden_email=pd.read_sql_query("""select * from final_customer_email""", conn)
                     st.session_state.report=report
                     st.session_state.downloads={
+                        "golden_email":golden_email,
+                        "golden_phone":golden_phone,
                         "golden_rec_email":golden_email.to_csv(index=False),
                         "golden_rec_phone":golden_phone.to_csv(index=False),                      
                     }
@@ -145,13 +144,15 @@ def main():
                     conn.close()
             if st.session_state.processed:
                 st.divider()
+                st.subheader("Email identified records")
+                st.dataframe(st.session_state.downloads["golden_email"])
+                st.subheader("Phone identified records")
+                st.dataframe(st.session_state.downloads["golden_phone"])
                 display_report(st.session_state.report)
                                    
                 st.subheader("Downloads")
-                st.dataframe(golden_email) 
                 st.download_button("Download final email table", st.session_state.downloads["golden_rec_email"], file_name="golden_recs_email.csv",
                     mime="text/csv")
-                st.dataframe(golden_phone)
                 st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
                     mime="text/csv")
         
