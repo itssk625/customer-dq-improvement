@@ -146,9 +146,6 @@ def main():
         st.error(f"Error: {e}")
         raise
     
-    finally:
-        cursor.close()
-        conn.close()
     
 if __name__=='__main__':
     main()
