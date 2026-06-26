@@ -134,18 +134,21 @@ def main():
                 cursor.close()
                 conn.close()
         if st.session_state.processed:
+            st.divider()
             display_report(st.session_state.report)
             st.subheader("Downloads")
             st.download_button("Download final email table", st.session_state.downloads["golden_rec_email"], file_name="golden_recs_email.csv",
                 mime="text/csv")
             st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
                 mime="text/csv")
-                
-            
-    
+
     except Exception as e:
         st.error(f"Error: {e}")
         raise
+    
+    finally:
+        cursor.close()
+        conn.close()
     
 if __name__=='__main__':
     main()
