@@ -30,15 +30,11 @@ def circ_progress(title, valid_count, total):
             }
         },
         margin=dict(l=5, r=5, t=40, b=5),
-        height=220
+        height=240,
+        width=240
     )
     
-    st.plotly_chart(
-        fig, 
-        use_container_width=True,
-        config={"displayModeBar":False}
-    )
-    
+    st.plotly_chart(fig)
     st.markdown(
         f"""
         <div style="
@@ -83,7 +79,25 @@ def display_metrics(rec):
     col1, col2, col3=st.columns(3)
     
     with col1:
-        st.metric("Total records", rec["total_records"])
+        st.markdown(
+            f"""
+            <div style="text-align:center;">
+            <div style="
+            font-size: 15px;
+            color:#bfbfbf;
+            font-weight:500;">
+            Total Records
+            </div>
+            </div style="
+            font-size:36px;
+            font-weight:700;
+            margin-top:4px;">
+            {rec["total_records"]}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+        )
         
     with col2:
         st.metric("Average DQ score", round(rec["average_dq_score"],2))
