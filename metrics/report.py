@@ -93,7 +93,7 @@ def display_metrics(rec):
                 ">
                     Total Records
                 </div>
-                </div style="
+                <div style="
                     font-size:20px;
                     font-weight:700;
                     font-family: Arial, sans-serif;
@@ -121,7 +121,7 @@ def display_metrics(rec):
                 ">
                     Average DQ score 
                 </div>
-                </div style="
+                <div style="
                     font-size:20px;
                     font-weight:700;
                     font-family: Arial, sans-serif;
@@ -151,7 +151,7 @@ def display_metrics(rec):
                 ">
                     Disposable Emails
                 </div>
-                </div style="
+                <div style="
                     font-size:20px;
                     font-weight:700;
                     font-family: Arial, sans-serif;
