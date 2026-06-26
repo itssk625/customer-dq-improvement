@@ -24,13 +24,24 @@ import uuid
 
 
 def main():
-    st.title("Customer DQ Improvement")
     if "processed" not in st.session_state:
         st.session_state.processed=False
     if "report" not in st.session_state:
         st.session_state.report=None
     if "downloads" not in st.session_state:
         st.session_state.downloads={}
+    if "page" not in st.session_state:
+        st.session_state.page="upload"
+    st.title("Customer DQ Improvement")
+    col1, col2=st.columns(2)
+    with col1:
+        if st.button("Upload"):
+            st.session_state.page="upload"
+    with col2:
+        if st.button("Dashboard"):
+            st.session_state.page="dashboard"
+    st.divider()
+            
     try:
         uploaded_file=st.file_uploader("Upload CSV", type=["csv"])
         if uploaded_file and st.button("Process file"):
