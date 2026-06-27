@@ -4,7 +4,7 @@ from db.connection import get_connection
 
 import plotly.graph_objects as go
 
-def display_chart(df, title_, y_col, y_label, suffix):
+def display_chart(df, title_, y_col, y_label, suffix=""):
     fig=go.Figure()
     fig.add_trace(
         go.Scatter(
