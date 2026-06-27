@@ -4,7 +4,19 @@ from db.connection import get_connection
 
 import plotly.graph_objects as go
 
-def display_chart(df, title_, y_col, y_label, suffix=""):
+def get_trend(conn, repo, column):
+    query=f"""
+    select distinct on (date_trunc('month', snapshot_timestamp))
+                            date_trunc('month', snapshot_timestamp) as month,
+                            round(({column}::numeric/total_records)*100,2) as validity_pct from metrics where repo_type=%s 
+                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc
+    
+    """
+    df=pd.read_sql_query(query, conn, params=[repo])
+    df['month']=df['month'].dt.strftime("%b %Y")
+    return df
+
+def display_chart(df, title_, y_col, y_label, suffix="", y_range=None):
     fig=go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -25,8 +37,10 @@ def display_chart(df, title_, y_col, y_label, suffix=""):
     
     fig.update_yaxes(
         ticksuffix=suffix,
-        showgrid=False, zeroline=False
+        showgrid=False, zeroline=False, range=y_range
     )
+    if y_range is not None:
+        fig.update_yaxes(range=y_range)
     st.plotly_chart(fig, use_container_width=True)
     
 def display_monthly_dashboard():
@@ -44,7 +58,7 @@ def display_monthly_dashboard():
                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
     dq_trend['month']=dq_trend['month'].dt.strftime("%b %Y")
     
-    display_chart(dq_trend, title_="Month-on-Month DQ Score", y_col='average_dq_score',y_label="DQ Score", suffix="%")
+    display_chart(dq_trend, title_="Month-on-Month DQ Score", y_col='average_dq_score',y_label="DQ Score", suffix="%", y_range=[0,100])
     
     repo_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
                                  date_trunc('month', snapshot_timestamp) as month,
@@ -56,59 +70,16 @@ def display_monthly_dashboard():
     display_chart(repo_trend, title_="Month-on-Month Record Growth", y_col='total_records', y_label='Total Records')
     
     st.subheader("Attribute-wise Validity Improvement")
-    attributes=['valid_name_count', 'valid_dob_count', 'valid_email_count', 'valid_phoneno_count', 'valid_gender_count', 'valid_country_count']
+    charts=[('valid_name_count',"Name"),( 'valid_dob_count', "DOB"), ('valid_gender_count',"Gender"),('valid_country_count', "Country")]
     
-    name_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
-                            date_trunc('month', snapshot_timestamp) as month,
-                            round((valid_name_count::numeric/total_records)*100,2) as valid_name_pct from metrics where repo_type=%s 
-                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
-    
-    name_trend['month']=name_trend['month'].dt.strftime("%b %Y")
-    
-    display_chart(name_trend, title_="Month-on-Month Name Validity Improvement", y_col='valid_name_pct', y_label='Name Validity (%)', suffix="%")
-    
-    dob_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
-                            date_trunc('month', snapshot_timestamp) as month,
-                            round((valid_dob_count::numeric/total_records)*100,2) as valid_dob_pct from metrics where repo_type=%s 
-                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
-
-    dob_trend['month']=dob_trend['month'].dt.strftime("%b %Y")
-
-    display_chart(dob_trend, title_="Month-on-Month DOB Validity Improvement", y_col='valid_dob_pct', y_label='DOB Validity (%)', suffix="%")
-
     if repo=="email":
-        phoneno_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
-                                date_trunc('month', snapshot_timestamp) as month,
-                                round((valid_phoneno_count::numeric/total_records)*100,2) as valid_phoneno_pct from metrics where repo_type=%s 
-                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
-
-        phoneno_trend['month']=phoneno_trend['month'].dt.strftime("%b %Y")
-
-        display_chart(phoneno_trend, title_="Month-on-Month Phone Number Validity Improvement", y_col='valid_phoneno_pct', y_label='Phone Number Validity (%)', suffix="%")
+        phoneno_trend=get_trend(conn, repo, "valid_phoneno_count")
+        display_chart(phoneno_trend, title_="Month-on-Month Phone Number Validity Improvement", y_col='validity_pct', y_label='Phone Number Validity (%)', suffix="%", y_range=[0,100])
     elif repo=="phone":
-        email_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
-                                date_trunc('month', snapshot_timestamp) as month,
-                                round((valid_email_count::numeric/total_records)*100,2) as valid_email_pct from metrics where repo_type=%s 
-                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
-
-        email_trend['month']=email_trend['month'].dt.strftime("%b %Y")
-
-        display_chart(email_trend, title_="Month-on-Month Email Validity Improvement", y_col='valid_email_pct', y_label='Email Validity (%)', suffix="%")
-        
-    country_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
-                            date_trunc('month', snapshot_timestamp) as month,
-                            round((valid_country_count::numeric/total_records)*100,2) as valid_country_pct from metrics where repo_type=%s 
-                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
-
-    country_trend['month']=country_trend['month'].dt.strftime("%b %Y")
-
-    display_chart(country_trend, title_="Month-on-Month Country Validity Improvement", y_col='valid_country_pct', y_label='Country Validity (%)', suffix="%")
-
-    gender_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
-                            date_trunc('month', snapshot_timestamp) as month,
-                            round((valid_gender_count::numeric/total_records)*100,2) as valid_gender_pct from metrics where repo_type=%s 
-                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
-
-    gender_trend['month']=gender_trend['month'].dt.strftime("%b %Y")
-
-    display_chart(gender_trend, title_="Month-on-Month Gender Validity Improvement", y_col='valid_gender_pct', y_label='Gender Validity (%)', suffix="%")
+        email_trend=get_trend(conn, repo, "valid_email_count")
+        display_chart(email_trend, title_="Month-on-Month Email Validity Improvement", y_col='validity_pct', y_label='Email Validity (%)', suffix="%", y_range=[0,100])
+    for column, title in charts:
+        trend=get_trend(conn, repo, column)
+        display_chart(trend, title_=f"Month-on-Month {title} Validity Improvement", y_col='validity_pct', y_label=f"{title} Validity (%)", suffix="%", y_range=[0,100])
+    
+    
