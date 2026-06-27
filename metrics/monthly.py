@@ -1,6 +1,35 @@
 import streamlit as st
+import pandas as pd
+from db.connection import get_connection
+
+import plotly.graph_objects as go
+
 def display_monthly_dashboard():
-    repo=st.selectbox(
-        "Repository",["email","phone"]
+    conn=get_connection()
+    c1, c2=st.columns(2)
+    with c1:
+        repo=st.selectbox(
+            "Repository",["email","phone"]
+        )
+    
+    dq_trend=pd.read_sql_query("""select distinct on date_trunc('month',snapshot_timestamp) as month,
+                               average_dq_score, total_records, snapshot_timestamp
+                               from metrics where repo_type="%s" 
+                               order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc)""", conn, params=[repo])
+    fig=go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=dq_trend["month"],
+            y=dq_trend["average_dq_score"],
+            mode="lines+markers",
+            name="Average DQ Score"
+        )
+    )
+    fig.update_layout(
+        title="Month-on-Month Average DQ Score",
+        xaxis_title="Month",
+        yaxis_title="AVG DQ SCORE",
+        template="plotly_dark", height=450
     )
     
+    st.plotly_chart(fig, use_container_width=True)
