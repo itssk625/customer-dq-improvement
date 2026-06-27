@@ -39,7 +39,7 @@ def display_monthly_dashboard():
     repo_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
                                  date_trunc('month', snapshot_timestamp) as month,
                                  total_records from metrics where repo_type=%s order by date_trunc('month', snapshot_timestamp),
-                                 snapshot_timestamp desc""")
+                                 snapshot_timestamp desc""", conn, params=[repo])
     
     fig=go.Figure()
     fig.add_trace(
