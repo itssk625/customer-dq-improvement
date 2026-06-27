@@ -15,7 +15,7 @@ def display_monthly_dashboard():
     dq_trend=pd.read_sql_query("""select distinct on (date_trunc('month',snapshot_timestamp))
                                date_trunc('month', snapshot_timestamp) as month,
                                average_dq_score, total_records, snapshot_timestamp
-                               from metrics where repo_type="%s" 
+                               from metrics where repo_type=%s
                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
     fig=go.Figure()
     fig.add_trace(
