@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from db.connection import get_connection
+from visualization import display_metrics
 def display_dashboard():
     st.title("Dashboard")
     conn=get_connection()
@@ -37,8 +38,9 @@ def display_dashboard():
         st.warning("No metrics available for selected month.")
         return 
     
+    st.divider()
     rec=dashboard.iloc[0]
-    col1, col2, col3=st.columns(3)
+    '''col1, col2, col3=st.columns(3)
     with col1:
         st.metric(
             "Total Records", rec["total_records"]
@@ -54,4 +56,7 @@ def display_dashboard():
                 "Disposable Emails",
                 f"{rec['disposable_email_pct']:.2f}%"
             )
+    '''
+    display_metrics(rec, showTitle=False)
+        
     conn.close()

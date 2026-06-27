@@ -129,8 +129,8 @@ def main():
                     """select distinct on (repo_type) * from metrics order by repo_type, snapshot_timestamp desc""", conn
                     )
                     
-                    golden_phone=pd.read_sql_query("""select * from final_customer_phone""", conn)
-                    golden_email=pd.read_sql_query("""select * from final_customer_email""", conn)
+                    golden_phone=pd.read_sql_query("""select * from final_customer_phone order by record_id""", conn)
+                    golden_email=pd.read_sql_query("""select * from final_customer_email order by record_id""", conn)
                     st.session_state.report=report
                     st.session_state.downloads={
                         "golden_email":golden_email,
