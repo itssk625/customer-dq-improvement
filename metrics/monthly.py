@@ -55,7 +55,7 @@ def display_monthly_dashboard():
     
     display_chart(repo_trend, title_="Month-on-Month Record Growth", y_col='total_records', y_label='Total Records')
     
-    st.write("Attribute-wise Validity Improvement")
+    st.subheader("Attribute-wise Validity Improvement")
     attributes=['valid_name_count', 'valid_dob_count', 'valid_email_count', 'valid_phoneno_count', 'valid_gender_count', 'valid_country_count']
     
     name_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
@@ -67,3 +67,48 @@ def display_monthly_dashboard():
     
     display_chart(name_trend, title_="Month-on-Month Name Validity Improvement", y_col='valid_name_pct', y_label='Name Validity (%)', suffix="%")
     
+    dob_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
+                            date_trunc('month', snapshot_timestamp) as month,
+                            round((valid_dob_count::numeric/total_records)*100,2) as valid_dob_pct from metrics where repo_type=%s 
+                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
+
+    dob_trend['month']=dob_trend['month'].dt.strftime("%b %Y")
+
+    display_chart(dob_trend, title_="Month-on-Month DOB Validity Improvement", y_col='valid_dob_pct', y_label='DOB Validity (%)', suffix="%")
+
+    if repo=="email":
+        phoneno_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
+                                date_trunc('month', snapshot_timestamp) as month,
+                                round((valid_phoneno_count::numeric/total_records)*100,2) as valid_phoneno_pct from metrics where repo_type=%s 
+                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
+
+        phoneno_trend['month']=phoneno_trend['month'].dt.strftime("%b %Y")
+
+        display_chart(phoneno_trend, title_="Month-on-Month Phone Number Validity Improvement", y_col='valid_phoneno_pct', y_label='Phone Number Validity (%)', suffix="%")
+    elif repo=="phone":
+        email_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
+                                date_trunc('month', snapshot_timestamp) as month,
+                                round((valid_email_count::numeric/total_records)*100,2) as valid_email_pct from metrics where repo_type=%s 
+                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
+
+        email_trend['month']=email_trend['month'].dt.strftime("%b %Y")
+
+        display_chart(email_trend, title_="Month-on-Month Email Validity Improvement", y_col='valid_email_pct', y_label='Email Validity (%)', suffix="%")
+        
+    country_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
+                            date_trunc('month', snapshot_timestamp) as month,
+                            round((valid_country_count::numeric/total_records)*100,2) as valid_country_pct from metrics where repo_type=%s 
+                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
+
+    country_trend['month']=country_trend['month'].dt.strftime("%b %Y")
+
+    display_chart(country_trend, title_="Month-on-Month Country Validity Improvement", y_col='valid_country_pct', y_label='Country Validity (%)', suffix="%")
+
+    gender_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
+                            date_trunc('month', snapshot_timestamp) as month,
+                            round((valid_gender_count::numeric/total_records)*100,2) as valid_gender_pct from metrics where repo_type=%s 
+                            order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
+
+    gender_trend['month']=gender_trend['month'].dt.strftime("%b %Y")
+
+    display_chart(gender_trend, title_="Month-on-Month Gender Validity Improvement", y_col='valid_gender_pct', y_label='Gender Validity (%)', suffix="%")
