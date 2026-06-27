@@ -16,7 +16,7 @@ def display_snapshot_dashboard():
     col1, col2=st.columns(2)
     with col1:
         repo=st.selectbox(
-        "Repository",["email","phone"]
+        "Repository",["Email","Phone"]
         )
     
     with col2:

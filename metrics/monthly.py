@@ -51,7 +51,7 @@ def display_monthly_dashboard():
     c1, c2=st.columns(2)
     with c1:
         repo=st.selectbox(
-            "Repository",["email","phone"]
+            "Repository",["Email","Phone"]
         )
     
     dq_trend=pd.read_sql_query("""select distinct on (date_trunc('month',snapshot_timestamp))
