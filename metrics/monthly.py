@@ -16,7 +16,7 @@ def get_trend(conn, repo, column):
     df['month']=df['month'].dt.strftime("%b %Y")
     return df
 
-def display_chart(df, title_, y_col, y_label, suffix="",auto_percent_range):
+def display_chart(df, title_, y_col, y_label, suffix="",auto_percent_range=False):
     fig=go.Figure()
     fig.add_trace(
         go.Scatter(
