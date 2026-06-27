@@ -189,7 +189,7 @@ def display_dashboard_metrics(rec):
     with col2:
         st.metric(
             "Average DQ Score",
-            f"{rec['average_dq_score']:.2f}"
+            f"{rec['average_dq_score']:.2f}%"
         )
         
     
