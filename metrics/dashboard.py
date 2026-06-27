@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from db.connection import get_connection
-from visualization import display_metrics
+from visualization import display_dashboard_metrics
 def display_dashboard():
     st.title("Dashboard")
     conn=get_connection()
@@ -57,6 +57,6 @@ def display_dashboard():
                 f"{rec['disposable_email_pct']:.2f}%"
             )
     '''
-    display_metrics(rec, showTitle=False)
+    display_dashboard_metrics(rec)
         
     conn.close()

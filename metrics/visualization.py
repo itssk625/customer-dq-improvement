@@ -57,15 +57,14 @@ def circ_progress(title, valid_count, total, repo_type):
     )
     
     
-def display_metrics(rec, showTitle=True):
+def display_report_metrics(rec):
     
     total=rec["total_records"]
-    if showTitle:
-        if (rec["repo_type"]=="email"):
-            st.subheader("Metrics for email identified records", text_alignment="center")
-        else:
-            st.write()
-            st.subheader("Metrics for phone identified records", text_alignment="center")
+    if (rec["repo_type"]=="email"):
+        st.subheader("Metrics for email identified records", text_alignment="center")
+    else:
+        st.write()
+        st.subheader("Metrics for phone identified records", text_alignment="center")
     col1, col2, col3=st.columns(3)
     with col1:
         circ_progress("Name", rec["valid_name_count"],total,rec["repo_type"])
@@ -172,4 +171,49 @@ def display_metrics(rec, showTitle=True):
         """,
         unsafe_allow_html=True,
         )
+        
+        
+def display_dashboard_metrics(rec):
+    
+    total=rec["total_records"]
+    col1, col2, col3=st.columns(3)
+    with col1:
+        circ_progress("Name", rec["valid_name_count"],total,rec["repo_type"])
+    with col2:
+        circ_progress("DOB", rec["valid_dob_count"], total,rec["repo_type"])
+    with col3:
+        if rec["repo_type"]=="email":
+            circ_progress("Phone number", rec["valid_phoneno_count"], total,rec["repo_type"])
+        else:
+            circ_progress("Email", rec["valid_email_count"], total,rec["repo_type"])
+    
+    col1, col2=st.columns(2)
+    with col1:
+        circ_progress("Country", rec["valid_country_count"], total,rec["repo_type"])
+    with col2:
+        circ_progress("Gender", rec["valid_gender_count"], total,rec["repo_type"])
+        
+    st.divider()
+    
+    col1, col2, col3=st.columns(3)
+    
+    with col1:
+        st.metric(
+            "Total Records",
+            f"{int(rec['total_records']):,}"
+        )
+        
+    with col2:
+        st.metric(
+            "Average DQ Score",
+            f"{rec['average_dq_score']:.2f}"
+        )
+        
+    
+    with col3:
+        if (rec["repo_type"]=="phone"):
+            st.metric(
+                "Disposable Emails",
+                f"{rec['disposable_email_pct']:.2f}%"
+            )
         
