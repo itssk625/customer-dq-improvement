@@ -14,7 +14,7 @@ def display_monthly_dashboard():
     
     dq_trend=pd.read_sql_query("""select distinct on (date_trunc('month',snapshot_timestamp))
                                date_trunc('month', snapshot_timestamp) as month,
-                               average_dq_score, total_records, snapshot_timestamp
+                               average_dq_score
                                from metrics where repo_type=%s
                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
     fig=go.Figure()
@@ -29,7 +29,7 @@ def display_monthly_dashboard():
     fig.update_layout(
         title="Month-on-Month Average DQ Score",
         xaxis_title="Month",
-        yaxis_title="AVG DQ SCORE",
+        yaxis_title="Average DQ Score",
         template="plotly_dark", height=450
     )
     
