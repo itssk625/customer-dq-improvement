@@ -17,6 +17,7 @@ def display_monthly_dashboard():
                                average_dq_score
                                from metrics where repo_type=%s
                                order by date_trunc('month', snapshot_timestamp), snapshot_timestamp desc""", conn, params=[repo])
+    dq_trend['month']=dq_trend['month'].dt.strftime("%b %Y")
     fig=go.Figure()
     fig.add_trace(
         go.Scatter(
