@@ -31,9 +31,15 @@ def display_monthly_dashboard():
         title="Month-on-Month Average DQ Score",
         xaxis_title="Month",
         yaxis_title="Average DQ Score",
-        template="plotly_dark", height=450
+        template="plotly_dark", height=450, plot_bgcolor="#0e1117", paper_bgcolor="#0e1117")
+    
+    fig.update_xaxes(
+        showgrid=False, zeroline=False
     )
     
+    fig.update_yaxes(
+        showgrid=False, zeroline=False
+    )
     st.plotly_chart(fig, use_container_width=True)
     
     repo_trend=pd.read_sql_query("""select distinct on (date_trunc('month', snapshot_timestamp))
@@ -55,6 +61,14 @@ def display_monthly_dashboard():
         title="Month-on-Month Record Growth",
         xaxis_title="Month",
         yaxis_title="Total Records",
-        template="plotly_dark", height=450
+        template="plotly_dark", height=450, plot_bgcolor="#0e1117", paper_bgcolor="#0e1117"
+    )
+    
+    fig.update_xaxes(
+        showgrid=False, zeroline=False
+    )
+    
+    fig.update_yaxes(
+        showgrid=False, zeroline=False
     )
     st.plotly_chart(fig, use_container_width=True)
