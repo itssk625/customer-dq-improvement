@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from db.connection import get_connection
-from visualization import display_dashboard_metrics
+from metrics.visualization import display_dashboard_metrics
 def display_dashboard():
     st.title("Dashboard")
     conn=get_connection()

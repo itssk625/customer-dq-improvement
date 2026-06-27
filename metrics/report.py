@@ -1,6 +1,6 @@
 import streamlit as st
 import plotly.graph_objects as go
-from visualization import display_report_metrics
+from metrics.visualization import display_report_metrics
     
 def display_report(report_df):
     st.subheader("Customer Data Quality Report", text_alignment="center")
