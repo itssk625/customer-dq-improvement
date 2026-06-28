@@ -159,6 +159,13 @@ def main():
         
         elif page=="Dashboard":
             #display_dashboard()
+            st.markdown("""
+                <style>
+                iframe {
+                    filter: invert(1) hue-rotate(180deg);
+                }
+                </style>
+            """, unsafe_allow_html=True)
             st.iframe("http://localhost:3000/public/dashboard/11228b8c-2254-4f87-b1c6-31592323ee11#night", height=800)
 
     except Exception as e:
