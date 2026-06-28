@@ -157,7 +157,8 @@ def main():
                     mime="text/csv")
         
         elif page=="Dashboard":
-            display_dashboard()
+            #display_dashboard()
+            st.components.v1.iframe("http://localhost:3000/public/dashboard/11228b8c-2254-4f87-b1c6-31592323ee11", height=800)
 
     except Exception as e:
         st.error(f"Error: {e}")
