@@ -38,6 +38,7 @@ def main():
     )
             
     try:
+        st.set_page_config(layout="wide")
         if page=="Upload":
             uploaded_file=st.file_uploader("Upload CSV", type=["csv"])
             if uploaded_file and st.button("Process file"):
