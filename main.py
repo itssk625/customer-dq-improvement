@@ -159,7 +159,7 @@ def main():
         
         elif page=="Dashboard":
             #display_dashboard()
-            st.iframe("http://localhost:3000/public/dashboard/11228b8c-2254-4f87-b1c6-31592323ee11?theme=night", height=800)
+            st.iframe("http://localhost:3000/public/dashboard/11228b8c-2254-4f87-b1c6-31592323ee11#night", height=800)
 
     except Exception as e:
         st.error(f"Error: {e}")
