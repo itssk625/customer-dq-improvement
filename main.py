@@ -189,7 +189,8 @@ def main():
                     st.dataframe(st.session_state.downloads["golden_phone"].head(10))
                 
                 if (st.session_state.email_valid or st.session_state.phone_valid):
-                    display_report(st.session_state.report)
+                    #display_report(st.session_state.report)
+                    st.iframe("http://localhost:3000/public/dashboard/3f2aa9b2-fafc-4966-9f57-49772dd29132", height="1500")
                                     
                 if (st.session_state.email_valid or st.session_state.phone_valid):
                     st.subheader("Downloads")
