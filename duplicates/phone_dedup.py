@@ -28,7 +28,6 @@ def dedup_phones(df):
     df=df.copy()
     conn=get_connection()
     cursor=conn.cursor()
-    file_id='1'
     candidates=[]
     all_phones=df['cleaned_phoneno'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
@@ -63,13 +62,15 @@ def merge_phones_master(df):
     update_recs=[]
     phones=df['cleaned_phoneno'].dropna().unique()
     conn=get_connection()
-    query="""SELECT * FROM final_customer_phone WHERE cleaned_phoneno=%s"""
+    placeholders=",".join(["%s"]*len(phones))
+    query=f"""SELECT * FROM final_customer_phone WHERE cleaned_phoneno in ({placeholders})"""
+    golden_records=pd.read_sql_query(query, conn, params=phones)
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for phone in phones:
         group=df[df['cleaned_phoneno']==phone]
-        golden_record=pd.read_sql_query(query, conn, params=[phone])
         record={}
         idx=group.index[0]
+        golden_record=golden_records[golden_records['cleaned_phoneno']==phone]
         if (golden_record.empty):
             record=(
                 df.loc[idx]

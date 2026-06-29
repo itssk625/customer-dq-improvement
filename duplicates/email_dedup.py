@@ -27,7 +27,6 @@ def dedup_emails(df):
     df=df.copy()
     conn=get_connection()
     cursor=conn.cursor()
-    file_id='1'
     candidates=[]
     all_emails=df['cleaned_email'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
@@ -62,14 +61,16 @@ def merge_emails_master(df):
     update_recs=[]
     conn=get_connection()
     cursor=conn.cursor()
-    emails=df['cleaned_email'].dropna().unique()
-    query=f"""SELECT * FROM final_customer_email WHERE cleaned_email=%s"""
+    emails=df['cleaned_email'].dropna().unique().tolist()
+    placeholders=",".join(["%s"]*len(emails))
+    query=f"""SELECT * FROM final_customer_email WHERE cleaned_email in ({placeholders})"""
+    golden_records=pd.read_sql_query(query, conn, params=emails)
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
     for email in emails:
         group=df[df['cleaned_email']==email]
-        golden_record=pd.read_sql_query(query, conn, params=[email])
         record={}
         idx=group.index[0]
+        golden_record=golden_records[golden_records['cleaned_email']==email]
         if (golden_record.empty):
             record=(
                 df.loc[idx]
