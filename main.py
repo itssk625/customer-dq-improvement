@@ -54,7 +54,8 @@ def main():
         "", ["Upload","Dashboard"],
         default="Upload"
     )
-            
+    conn=get_connection()
+    cursor=conn.cursor()        
     try:
         if page=="Upload":
             uploaded_file=st.file_uploader("Upload CSV", type=["csv"])
@@ -65,8 +66,7 @@ def main():
                 if df['email'].isna().all() and df['phone_no'].isna().all():
                         raise ValueError("Email and phone columns are empty: No valid data available for processing")
                 with st.spinner("Processing records..."):
-                    conn=get_connection()
-                    cursor=conn.cursor()
+                    
                     df["file_id"]=file_id
                     df=df[["file_id",
                             "first_name",
