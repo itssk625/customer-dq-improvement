@@ -23,7 +23,21 @@ from io import StringIO
 import streamlit as st
 import uuid
 
+st.set_page_config(layout="wide")
 
+def validate_file(df):
+    required_columns=['first_name', 'last_name', 'dob', 'country', 'gender', 'email', 'phone_no']
+    if df.empty:
+        raise ValueError("Uploaded file is empty.")
+    missing=set(required_columns)-set(df.columns)
+    if missing: 
+        raise ValueError(f"Missing columns: {missing}")
+    extra=set(df.columns)-set(required_columns)
+    if extra:
+        print(f"Warning: Extra columns {extra} will be ignored")
+        df=df[required_columns]
+    return df
+    
 def main():
     if "processed" not in st.session_state:
         st.session_state.processed=False
@@ -31,6 +45,10 @@ def main():
         st.session_state.report=None
     if "downloads" not in st.session_state:
         st.session_state.downloads={}
+    if "email_valid" not in st.session_state:
+        st.session_state.email_valid=False
+    if "phone_valid" not in st.session_state:
+        st.session_state.phone_valid=False
     st.title("Customer DQ Improvement")
     page=st.segmented_control(
         "", ["Upload","Dashboard"],
@@ -38,12 +56,14 @@ def main():
     )
             
     try:
-        st.set_page_config(layout="wide")
         if page=="Upload":
             uploaded_file=st.file_uploader("Upload CSV", type=["csv"])
             if uploaded_file and st.button("Process file"):
                 file_id=str(uuid.uuid4())
                 df=pd.read_csv(uploaded_file)
+                df=validate_file(df)
+                if df['email'].isna().all() and df['phone_no'].isna().all():
+                        raise ValueError("Email and phone columns are empty: No valid data available for processing")
                 with st.spinner("Processing records..."):
                     conn=get_connection()
                     cursor=conn.cursor()
@@ -132,6 +152,21 @@ def main():
                     
                     golden_phone=pd.read_sql_query("""select * from final_customer_phone order by record_id""", conn)
                     golden_email=pd.read_sql_query("""select * from final_customer_email order by record_id""", conn)
+                    if (golden_email.empty and golden_phone.empty):
+                        st.warning("No valid records were found. Tables were not populated")      
+                        st.session_state.email_valid=False
+                        st.session_state.phone_valid=False
+                    elif (golden_phone.empty):
+                        st.warning("No valid phone-identified records were found")                    
+                        st.session_state.email_valid=True
+                        st.session_state.phone_valid=False
+                    elif (golden_email.empty):
+                        st.warning("No valid email-identified records were found")
+                        st.session_state.email_valid=False
+                        st.session_state.phone_valid=True
+                    else:
+                        st.session_state.email_valid=True
+                        st.session_state.phone_valid=True
                     st.session_state.report=report
                     st.session_state.downloads={
                         "golden_email":golden_email,
@@ -140,30 +175,40 @@ def main():
                         "golden_rec_phone":golden_phone.to_csv(index=False),                      
                     }
                     st.session_state.processed=True
-                    st.success("Processing completed successfully!")
+                    if (st.session_state.email_valid or st.session_state.phone_valid):
+                        st.success("Processing completed successfully!")
                     cursor.close()
                     conn.close()
             if st.session_state.processed:
                 st.divider()
-                st.subheader("Email identified records")
-                st.dataframe(st.session_state.downloads["golden_email"].head(10))
-                st.subheader("Phone identified records")
-                st.dataframe(st.session_state.downloads["golden_phone"].head(10))
-                display_report(st.session_state.report)
-                                   
-                st.subheader("Downloads")
-                st.download_button("Download final email table", st.session_state.downloads["golden_rec_email"], file_name="golden_recs_email.csv",
-                    mime="text/csv")
-                st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
-                    mime="text/csv")
+                if (st.session_state.email_valid):
+                    st.subheader("Email identified records")
+                    st.dataframe(st.session_state.downloads["golden_email"].head(10))
+                if (st.session_state.phone_valid):
+                    st.subheader("Phone identified records")
+                    st.dataframe(st.session_state.downloads["golden_phone"].head(10))
+                
+                if (st.session_state.email_valid or st.session_state.phone_valid):
+                    display_report(st.session_state.report)
+                                    
+                if (st.session_state.email_valid or st.session_state.phone_valid):
+                    st.subheader("Downloads")
+                if (st.session_state.email_valid):
+                    st.download_button("Download final email table", st.session_state.downloads["golden_rec_email"], file_name="golden_recs_email.csv",
+                        mime="text/csv")
+                if (st.session_state.phone_valid):
+                    st.download_button("Download final phone table", st.session_state.downloads["golden_rec_phone"], file_name="golden_recs_phone.csv",
+                        mime="text/csv")
         
         elif page=="Dashboard":
-            #display_dashboard()
             st.iframe("http://localhost:3000/public/dashboard/11228b8c-2254-4f87-b1c6-31592323ee11#night", height=2000)
 
     except Exception as e:
         st.error(f"Error: {e}")
         raise
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
     
     
 if __name__=='__main__':
