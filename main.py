@@ -96,7 +96,7 @@ def main():
                     df=standardize_country(df)
                     df=standardize_gender(df)
                     df=enrich_emails(df)
-                    #df=enrich_phones(df)
+                    df=enrich_phones(df)
                     df=score_risk(df)
 
                     df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','name_issues','dob_issues', 'email_issues','phoneno_issues','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','cleaned_gender','iso_code','nationality_issue', 'gender_issues','is_disposable_email']]
