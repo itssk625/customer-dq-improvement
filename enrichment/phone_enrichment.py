@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import requests
 import streamlit as st
 
@@ -103,13 +104,20 @@ country_codes = {
 
 
 def get_operator(phone):
-    url="http://apilayer.net/api/validate"
-    params={
-        "access_key": st.secrets["API_KEY"],
-        "number": phone
-    }
-    resp=requests.get(url, params=params)
-    return resp.json()
+        url="http://apilayer.net/api/validate"
+        params={
+            "access_key": st.secrets["API_KEY"],
+            "number": phone
+        }
+        resp=requests.get(url, params=params)
+        if resp.status_code!=200:
+            return {}
+        try:
+            return resp.json()
+        except Exception as e:
+            print(f"JSON parse error for {phone}:{e}")
+            return {}
+        
 def enrich_phones(df):
     df=df.copy()
     df['extracted_country']=df['code'].map(country_codes)    
@@ -120,11 +128,15 @@ def enrich_phones(df):
             cache[phone]=get_operator(phone)
         except Exception as e:
             cache[phone]={}
+            print(f"API error for {phone}: {e}")
         
     for idx in df.loc[mask, 'cleaned_phoneno'].index:
         phone=df.loc[idx, 'cleaned_phoneno']
+        if pd.isna(phone):
+            continue
         df.loc[idx, "extracted_operator"]=cache.get(phone, {}).get("carrier")
+        if (cache.get(phone, {}).get("valid"))==False:
+            df.loc[idx, 'cleaned_phoneno']=np.nan
     
-        
     return df
 
