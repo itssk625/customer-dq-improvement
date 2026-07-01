@@ -29,7 +29,7 @@ def dedup_emails(df):
     cursor=conn.cursor()
     candidates=[]
     all_emails=df['cleaned_email'].dropna().unique().tolist()
-    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
+    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
     for email in all_emails:
         group=df[df['cleaned_email']==email]
         group=group.sort_values('record_id')
@@ -37,6 +37,12 @@ def dedup_emails(df):
             record={}
             for field in fields:
                 for idx in group.index:
+                    if field=='upload_date':
+                        if field not in record:
+                            record[field]=df.loc[idx, field]
+                        elif field in record:
+                            record[field]=max(record[field], df.loc[idx, field])
+                        continue
                     if field not in record or pd.notna(df.loc[idx, field]):
                         record[field] = df.loc[idx, field]
                         for f in related_fields[field]:
@@ -65,7 +71,7 @@ def merge_emails_master(df):
     placeholders=",".join(["%s"]*len(emails))
     query=f"""SELECT * FROM final_customer_email WHERE cleaned_email in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=emails)
-    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
+    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
     for email in emails:
         group=df[df['cleaned_email']==email]
         record={}
@@ -86,6 +92,9 @@ def merge_emails_master(df):
         
             changed=False
             for field in fields:
+                if field=='upload_date':
+                    record[field]=max(master[field],df.loc[idx, field])
+                    continue
                 if pd.notna(df.loc[idx, field]):
                     record[field]=df.loc[idx, field]
                     for f in related_fields[field]:

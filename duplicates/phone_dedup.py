@@ -30,7 +30,7 @@ def dedup_phones(df):
     cursor=conn.cursor()
     candidates=[]
     all_phones=df['cleaned_phoneno'].dropna().unique().tolist()
-    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
+    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
     for phone in all_phones:
         group=df[df['cleaned_phoneno']==phone]
         group=group.sort_values('record_id')
@@ -38,6 +38,12 @@ def dedup_phones(df):
             record={}
             for field in fields:
                 for idx in group.index:
+                    if field=='upload_date':
+                        if field not in record:
+                            record[field]=df.loc[idx, field]
+                        elif field in record:
+                            record[field]=max(record[field], df.loc[idx, field])
+                        continue
                     if field not in record or pd.notna(df.loc[idx, field]):
                         record[field] = df.loc[idx, field]
                         for f in related_fields[field]:
@@ -65,7 +71,7 @@ def merge_phones_master(df):
     placeholders=",".join(["%s"]*len(phones))
     query=f"""SELECT * FROM final_customer_phone WHERE cleaned_phoneno in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=phones)
-    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender']
+    fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
     for phone in phones:
         group=df[df['cleaned_phoneno']==phone]
         record={}
@@ -84,6 +90,9 @@ def merge_phones_master(df):
                 master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
             changed=False
             for field in fields:
+                if field=='upload_date':
+                    record[field]=max(master[field],df.loc[idx, field])
+                    continue
                 if pd.notna(df.loc[idx, field]):
                     record[field]=df.loc[idx, field]
                     for f in related_fields[field]:
