@@ -22,7 +22,7 @@ def validate_dobs(df):
     df['parsed_dob']=pd.NaT
     for fmt in formats:
         mask=pd.isna(df['parsed_dob'])
-        parsed=pd.to_datetime(df.loc[mask,'clean_dob'],format= fmt,errors='coerce')
+        parsed=pd.to_datetime(df.loc[mask,'clean_dob'],format= "%d-%m-%y",errors='coerce')
         df.loc[mask, 'parsed_dob']=parsed
                     
     invalid_date=(pd.isna(df['parsed_dob']) & (~emptymask))
