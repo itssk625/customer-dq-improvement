@@ -79,7 +79,7 @@ def main():
                     buffer = StringIO()
                     df.to_csv(buffer, index=False)
                     buffer.seek(0)
-
+                    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
                     cursor.copy_expert(
                         """
                         COPY raw_customer_records
@@ -124,6 +124,7 @@ def main():
                     buffer=StringIO()
                     df.to_csv(buffer, index=False, header=False)
                     buffer.seek(0)
+                    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
                     cursor.copy_expert(
                         """
                         COPY cleaned_customer_records(file_id,

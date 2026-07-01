@@ -56,6 +56,7 @@ def dedup_emails(df):
             candidates.append(record)
     
     master_candidates=pd.DataFrame(candidates)  
+    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
     conn.commit()
     cursor.close()
     conn.close()
@@ -122,6 +123,7 @@ def merge_emails_master(df):
                 update_recs.append(record)
             
     for rec in insert_recs:
+        rec["upload_date"]=pd.to_datetime(rec["upload_date"], format="%d-%m-%Y")
         cols=list(rec.keys())
         vals=[normalize(rec[col]) for col in cols]
 
@@ -134,6 +136,7 @@ def merge_emails_master(df):
         cursor.execute(query, tuple(vals))
     conn.commit()
     for rec in update_recs:
+        rec["upload_date"]=pd.to_datetime(rec["upload_date"], format="%d-%m-%Y")
         cols=[
             col 
             for col in rec.keys()
