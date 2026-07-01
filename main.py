@@ -146,12 +146,8 @@ def main():
                     dedup_emails(df)
                     dedup_phones(df)
                     
-                    score_dq()
-                    calculate_metrics()
-                    report=pd.read_sql_query(
-                    """select distinct on (repo_type) * from metrics order by repo_type, snapshot_timestamp desc""", conn
-                    )
-                    
+                    #score_dq()
+                    #calculate_metrics() 
                     golden_phone=pd.read_sql_query("""select * from final_customer_phone order by record_id""", conn)
                     golden_email=pd.read_sql_query("""select * from final_customer_email order by record_id""", conn)
                     if (golden_email.empty and golden_phone.empty):
@@ -192,7 +188,6 @@ def main():
                 
                 if (st.session_state.email_valid or st.session_state.phone_valid):
                     st.divider()
-                    #display_report(st.session_state.report)
                     st.iframe("http://localhost:3000/public/dashboard/3f2aa9b2-fafc-4966-9f57-49772dd29132", height=600)
                                     
                 if (st.session_state.email_valid or st.session_state.phone_valid):
