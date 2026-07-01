@@ -13,15 +13,15 @@ def score_dq():
     df['dq_score']=((df["email_issues"]).isna().astype(int)*25+(df['phoneno_issues']).isna().astype(int)*25
     +df["name_issues"].isna().astype(int)*15+df['dob_issues'].isna().astype(int)*10+df["nationality_issue"].isna().astype(int)*20
     +df['gender'].notna().astype(int)*5)
-    st.write(time.perf_counter_counter()-start)
+    st.write(time.perf_counter()-start)
     start=time.perf_counter()
     values=[(int(row["dq_score"]), row["cleaned_email"]) for _, row in df.iterrows()]
-    st.write(time.perf_counter_counter()-start)
+    st.write(time.perf_counter()-start)
     start=time.perf_counter()
     cursor.executemany("""update final_customer_email set dq_score=%s where cleaned_email=%s""", values)
     conn.commit()
     print(len(values))
-    st.write(time.perf_counter_counter()-start)
+    st.write(time.perf_counter()-start)
     
     
     df=pd.read_sql_query("SELECT cleaned_phoneno, name_issues, dob_issues, email_issues, phoneno_issues, nationality_issue, is_disposable_email, gender from final_customer_phone", conn)
@@ -33,15 +33,15 @@ def score_dq():
         df['phoneno_issues'].isna().astype(int)*25
         +df["name_issues"].isna().astype(int)*15+df['dob_issues'].isna().astype(int)*10+df["nationality_issue"].isna().astype(int)*20
         +df['gender'].notna().astype(int)*5)
-    st.write(time.perf_counter_counter()-start)
+    st.write(time.perf_counter()-start)
     start=time.perf_counter()
     values=[(int(row["dq_score"]), row["cleaned_phoneno"]) for _, row in df.iterrows()]
-    st.write(time.perf_counter_counter()-start)
+    st.write(time.perf_counter()-start)
 
     start=time.perf_counter()
     cursor.executemany("""update final_customer_phone set dq_score=%s where cleaned_phoneno=%s""", values)
     print(len(values))
-    st.write(time.perf_counter_counter()-start)
+    st.write(time.perf_counter()-start)
     
     conn.commit()
     cursor.close()
