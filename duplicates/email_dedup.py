@@ -68,7 +68,6 @@ def merge_emails_master(df):
     query=f"""SELECT * FROM final_customer_email WHERE cleaned_email in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=emails)
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
-    golden_records['upload_date']=pd.to_datetime(golden_records['upload_date'], format="%d-%m-%Y")
     golden_records=golden_records.set_index("cleaned_email")
     for email,group in df.groupby("cleaned_email"):
         record={}
@@ -76,8 +75,6 @@ def merge_emails_master(df):
 
         if email in golden_records.index:
             master=golden_records.loc[email].copy()
-            if (pd.notna(master["cleaned_dob"])):
-                master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
         
             changed=False
             for field in fields:
@@ -100,9 +97,7 @@ def merge_emails_master(df):
                 new_val=record[field]
                 if (pd.isna(old_val) and pd.isna(new_val)):
                     continue
-                elif (field=="cleaned_dob"):
-                    if (pd.notna(record["cleaned_dob"])):
-                        record["cleaned_dob"]=pd.to_datetime(record["cleaned_dob"]).strftime("%d-%m-%Y")
+              
                     new_val=record[field]
                     if (old_val!=new_val):
                         changed=True

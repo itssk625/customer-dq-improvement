@@ -76,8 +76,7 @@ def main():
                             "gender",
                             "email",
                             "phone_no", "upload_date"]]
-                    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
-
+                    df['upload_date']=pd.to_datetime(df['upload_date'])
                     buffer = StringIO()
                     df.to_csv(buffer, index=False)
                     buffer.seek(0)
@@ -122,7 +121,6 @@ def main():
 
                     df=df[['file_id','cleaned_name','cleaned_dob', 'cleaned_email','cleaned_phoneno', 'standardized_country','name_issues','dob_issues', 'email_issues','phoneno_issues','email_classified_as','extracted_domain', 'extracted_operator','extracted_country','risk_score','cleaned_gender','iso_code','nationality_issue', 'gender_issues','is_disposable_email', 'upload_date']]
                     df['risk_score']=df["risk_score"].astype("Int64")
-                    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
                     buffer=StringIO()
                     df.to_csv(buffer, index=False, header=False)
                     buffer.seek(0)

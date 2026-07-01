@@ -67,7 +67,6 @@ def merge_phones_master(df):
     placeholders=",".join(["%s"]*len(phones))
     query=f"""SELECT * FROM final_customer_phone WHERE cleaned_phoneno in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=phones)
-    golden_records['upload_date']=pd.to_datetime(golden_records['upload_date'], format="%d-%m-%Y")
     golden_records=golden_records.set_index("cleaned_phoneno")
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
     for phone, group in df.groupby("cleaned_phoneno"):
@@ -75,8 +74,7 @@ def merge_phones_master(df):
         idx=group.index[0]
         if phone in golden_records.index:
             master=golden_records.loc[phone].copy()
-            if (pd.notna(master["cleaned_dob"])):
-                master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
+        
             changed=False
             for field in fields:
                 if field=='upload_date':
@@ -98,10 +96,7 @@ def merge_phones_master(df):
                 new_val=record[field]
                 if (pd.isna(old_val) and pd.isna(new_val)):
                     continue
-                elif (field=="cleaned_dob"):
-                    if (pd.notna(record["cleaned_dob"])):
-                        record["cleaned_dob"]=pd.to_datetime(record["cleaned_dob"]).strftime("%d-%m-%Y")
-                    new_val=record[field]
+              
                     if (old_val!=new_val):
                         changed=True
                 elif (normalize(old_val)!=normalize(new_val)):
@@ -113,6 +108,7 @@ def merge_phones_master(df):
                 df.loc[idx]
                 .drop(['record_id','file_id', 'risk_score','is_emailduplicate', 'is_phone_duplicate', 'is_corrected'], errors="ignore")
             ).to_dict()
+         
             if (pd.notna(record["cleaned_phoneno"])):
                 insert_recs.append(record)
     if insert_recs:
