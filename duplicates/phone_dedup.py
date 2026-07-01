@@ -113,16 +113,15 @@ def merge_phones_master(df):
             ).to_dict()
             if (pd.notna(record["cleaned_phoneno"])):
                 insert_recs.append(record)
-    for rec in insert_recs:
-        cols=list(rec.keys())
-        vals=[normalize(rec[col]) for col in cols]
+    if insert_recs:
+        cols=list(insert_recs[0].keys())
+        vals=[tuple(normalize(rec[col]) for col in cols)  for rec in insert_recs]
         cols=",".join(cols)
-        placeholders=",".join(["%s"]*(len(rec)))
         query=f"""
-        INSERT INTO final_customer_phone ({cols}) values ({placeholders})
+        INSERT INTO final_customer_phone ({cols}) values %s
         """
-        cursor.execute(query, tuple(vals))
-    conn.commit()
+        cursor.execute_values(cursor, query, vals)
+        conn.commit()
     for rec in update_recs:
         phone=rec["cleaned_phoneno"]
         cols=[

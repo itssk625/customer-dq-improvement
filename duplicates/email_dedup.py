@@ -1,4 +1,5 @@
 import pandas as pd
+from psycopg2.extras import execute_values
 import numpy as np
 from db.connection import get_connection
 related_fields={
@@ -117,18 +118,16 @@ def merge_emails_master(df):
             if (pd.notna(record["cleaned_email"])):
                 insert_recs.append(record)
             
-    for rec in insert_recs:
-        cols=list(rec.keys())
-        vals=[normalize(rec[col]) for col in cols]
+    if insert_recs:
+        cols=list(insert_recs[0].keys())
+        vals=[tuple(normalize(rec[col]) for col in cols) for rec in insert_recs]
 
         cols=",".join(cols)
-        
-        placeholders=",".join(["%s"]*(len(rec)))
         query=f"""
-        INSERT INTO final_customer_email ({cols}) values ({placeholders})
+        INSERT INTO final_customer_email ({cols}) values %s
         """
-        cursor.execute(query, tuple(vals))
-    conn.commit()
+        cursor.execute_values(cursor,query, vals)
+        conn.commit()
     for rec in update_recs:
         cols=[
             col 
