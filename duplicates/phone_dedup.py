@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from db.connection import get_connection
-from pyscopg2.extras import execute_values            
+from psycopg2.extras import execute_values            
 related_fields={
     "cleaned_name": ["name_issues"],
     "cleaned_dob":["dob_issues"],
