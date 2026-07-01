@@ -76,7 +76,7 @@ def main():
                             "gender",
                             "email",
                             "phone_no", "upload_date"]]
-                    df['upload_date']=pd.to_datetime(df['upload_date'])
+                    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
                     buffer = StringIO()
                     df.to_csv(buffer, index=False)
                     buffer.seek(0)
