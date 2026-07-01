@@ -93,8 +93,10 @@ def merge_emails_master(df):
                     record[field]=master[field]
                     for f in related_fields[field]:
                         record[f]=master[f]  
-                     
-                old_val=master[field]
+                if (field=="cleaned_email"):
+                    old_val=email
+                else:
+                    old_val=master[field]
                 new_val=record[field]
                 if (pd.isna(old_val) and pd.isna(new_val)):
                     continue

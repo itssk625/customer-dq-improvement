@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from db.connection import get_connection
-             
+from pyscopg2.extras import execute_values            
 related_fields={
     "cleaned_name": ["name_issues"],
     "cleaned_dob":["dob_issues"],
@@ -91,8 +91,10 @@ def merge_phones_master(df):
                     record[field]=master[field]
                     for f in related_fields[field]:
                         record[f]=master[f]  
-                     
-                old_val=master[field]
+                if (field=="cleaned_phoneno"):
+                    old_val=phone
+                else:
+                    old_val=master[field]
                 new_val=record[field]
                 if (pd.isna(old_val) and pd.isna(new_val)):
                     continue
@@ -120,7 +122,7 @@ def merge_phones_master(df):
         query=f"""
         INSERT INTO final_customer_phone ({cols}) values %s
         """
-        cursor.execute_values(cursor, query, vals)
+        execute_values(cursor, query, vals)
         conn.commit()
     for rec in update_recs:
         phone=rec["cleaned_phoneno"]
