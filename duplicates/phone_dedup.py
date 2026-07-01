@@ -26,13 +26,10 @@ def normalize(v):
 
 def dedup_phones(df):
     df=df.copy()
-    conn=get_connection()
-    cursor=conn.cursor()
+    df=df.sort_values("record_id")
     candidates=[]
-    all_phones=df['cleaned_phoneno'].dropna().unique().tolist()
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
-    for phone in all_phones:
-        group=df[df['cleaned_phoneno']==phone]
+    for phone,group in df.groupby("cleaned_phoneno"):
         group=group.sort_values('record_id')
         if (len(group)>1): 
             record={}
@@ -56,10 +53,6 @@ def dedup_phones(df):
             candidates.append(record)
     
     master_candidates=pd.DataFrame(candidates)    
-    conn.commit()
-    cursor.close()
-    conn.close()
-    
     merge_phones_master(master_candidates)
 
 def merge_phones_master(df):
@@ -67,25 +60,20 @@ def merge_phones_master(df):
     insert_recs=[]
     update_recs=[]
     phones=df['cleaned_phoneno'].dropna().unique()
+    if len(phones)==0:
+        return
     conn=get_connection()
+    cursor=conn.cursor()
     placeholders=",".join(["%s"]*len(phones))
     query=f"""SELECT * FROM final_customer_phone WHERE cleaned_phoneno in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=phones)
+    golden_records=golden_records.set_index("cleaned_phoneno")
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
-    for phone in phones:
-        group=df[df['cleaned_phoneno']==phone]
+    for phone, group in df.groupby("cleaned_phoneno"):
         record={}
         idx=group.index[0]
-        golden_record=golden_records[golden_records['cleaned_phoneno']==phone]
-        if (golden_record.empty):
-            record=(
-                df.loc[idx]
-                .drop(['record_id','file_id', 'risk_score','is_emailduplicate', 'is_phone_duplicate', 'is_corrected'], errors="ignore")
-            ).to_dict()
-            if (pd.notna(record["cleaned_phoneno"])):
-                insert_recs.append(record)
-        else:
-            master=golden_record.iloc[0].copy()
+        if phone in golden_records.index:
+            master=golden_records.loc[phone].copy()
             if (pd.notna(master["cleaned_dob"])):
                 master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
             changed=False
@@ -117,7 +105,13 @@ def merge_phones_master(df):
                     changed=True
             if (changed):
                 update_recs.append(record)
-    cursor=conn.cursor()
+        else:
+            record=(
+                df.loc[idx]
+                .drop(['record_id','file_id', 'risk_score','is_emailduplicate', 'is_phone_duplicate', 'is_corrected'], errors="ignore")
+            ).to_dict()
+            if (pd.notna(record["cleaned_phoneno"])):
+                insert_recs.append(record)
     for rec in insert_recs:
         cols=list(rec.keys())
         vals=[normalize(rec[col]) for col in cols]

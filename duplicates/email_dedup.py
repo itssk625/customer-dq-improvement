@@ -25,14 +25,10 @@ def normalize(v):
 
 def dedup_emails(df):
     df=df.copy()
-    conn=get_connection()
-    cursor=conn.cursor()
     candidates=[]
-    all_emails=df['cleaned_email'].dropna().unique().tolist()
+    df=df.sort_values("record_id")
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
-    for email in all_emails:
-        group=df[df['cleaned_email']==email]
-        group=group.sort_values('record_id')
+    for email,group in df.groupby("cleaned_email"):
         if (len(group)>1): 
             record={}
             for field in fields:
@@ -56,10 +52,6 @@ def dedup_emails(df):
             candidates.append(record)
     
     master_candidates=pd.DataFrame(candidates)  
-    df['upload_date']=pd.to_datetime(df['upload_date'], format="%d-%m-%Y")
-    conn.commit()
-    cursor.close()
-    conn.close()
     merge_emails_master(master_candidates)
 
 def merge_emails_master(df):
@@ -69,25 +61,19 @@ def merge_emails_master(df):
     conn=get_connection()
     cursor=conn.cursor()
     emails=df['cleaned_email'].dropna().unique().tolist()
+    if len(emails)==0:
+        return
     placeholders=",".join(["%s"]*len(emails))
     query=f"""SELECT * FROM final_customer_email WHERE cleaned_email in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=emails)
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
-    for email in emails:
-        group=df[df['cleaned_email']==email]
+    golden_records=golden_records.set_index("cleaned_email")
+    for email,group in df.groupby("cleaned_email"):
         record={}
         idx=group.index[0]
-        golden_record=golden_records[golden_records['cleaned_email']==email]
-        if (golden_record.empty):
-            record=(
-                df.loc[idx]
-                .drop(["file_id","record_id","risk_score", "is_emailduplicate", "is_corrected", "is_disposable_email","is_phone_duplicate"], errors="ignore")  
-            ).to_dict()
-            if (pd.notna(record["cleaned_email"])):
-                insert_recs.append(record)
 
-        else:
-            master=golden_record.iloc[0].copy()
+        if email in golden_records.index:
+            master=golden_records.loc[email].copy()
             if (pd.notna(master["cleaned_dob"])):
                 master["cleaned_dob"]=pd.to_datetime(master["cleaned_dob"]).strftime("%d-%m-%Y")
         
@@ -121,9 +107,16 @@ def merge_emails_master(df):
 
             if (changed):     
                 update_recs.append(record)
+                
+        else:
+            record=(
+                df.loc[idx]
+                .drop(["file_id","record_id","risk_score", "is_emailduplicate", "is_corrected", "is_disposable_email","is_phone_duplicate"], errors="ignore")  
+            ).to_dict()
+            if (pd.notna(record["cleaned_email"])):
+                insert_recs.append(record)
             
     for rec in insert_recs:
-        rec["upload_date"]=pd.to_datetime(rec["upload_date"], format="%d-%m-%Y")
         cols=list(rec.keys())
         vals=[normalize(rec[col]) for col in cols]
 
@@ -136,7 +129,6 @@ def merge_emails_master(df):
         cursor.execute(query, tuple(vals))
     conn.commit()
     for rec in update_recs:
-        rec["upload_date"]=pd.to_datetime(rec["upload_date"], format="%d-%m-%Y")
         cols=[
             col 
             for col in rec.keys()
