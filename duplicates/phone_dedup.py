@@ -67,6 +67,7 @@ def merge_phones_master(df):
     placeholders=",".join(["%s"]*len(phones))
     query=f"""SELECT * FROM final_customer_phone WHERE cleaned_phoneno in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=phones)
+    golden_records['upload_date']=pd.to_datetime(golden_records['upload_date'], format="%d-%m-%Y")
     golden_records=golden_records.set_index("cleaned_phoneno")
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
     for phone, group in df.groupby("cleaned_phoneno"):

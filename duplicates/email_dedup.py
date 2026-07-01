@@ -67,6 +67,7 @@ def merge_emails_master(df):
     query=f"""SELECT * FROM final_customer_email WHERE cleaned_email in ({placeholders})"""
     golden_records=pd.read_sql_query(query, conn, params=emails)
     fields=['cleaned_name', 'cleaned_dob', 'cleaned_email', 'cleaned_phoneno', 'standardized_country',  'gender', 'upload_date']
+    golden_records['upload_date']=pd.to_datetime(golden_records['upload_date'], format="%d-%m-%Y")
     golden_records=golden_records.set_index("cleaned_email")
     for email,group in df.groupby("cleaned_email"):
         record={}
