@@ -165,7 +165,6 @@ def main():
                     else:
                         st.session_state.email_valid=True
                         st.session_state.phone_valid=True
-                    st.session_state.report=report
                     st.session_state.downloads={
                         "golden_email":golden_email,
                         "golden_phone":golden_phone,
