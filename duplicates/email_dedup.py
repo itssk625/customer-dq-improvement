@@ -11,6 +11,27 @@ related_fields={
     "gender":["gender_issues"]
 }
 
+def calculate_dq(record):
+    score=0
+    if pd.isna(record['email_issues']):
+        score += 25
+
+    if pd.isna(record["phoneno_issues"]):
+        score += 25
+
+    if pd.isna(record["name_issues"]):
+        score += 15
+
+    if pd.isna(record["dob_issues"]):
+        score += 10
+
+    if pd.isna(record["nationality_issue"]):
+        score += 20
+
+    if pd.notna(record["gender"]):
+        score += 5
+
+    return score
 def normalize(v):
     if pd.isna(v):
         return None
@@ -98,13 +119,13 @@ def merge_emails_master(df):
                 if (pd.isna(old_val) and pd.isna(new_val)):
                     continue
               
-                    new_val=record[field]
-                    if (old_val!=new_val):
-                        changed=True
+                if (old_val!=new_val):
+                    changed=True
                 elif (normalize(old_val)!=normalize(new_val)):
                     changed=True   
 
             if (changed):     
+                record["dq_score"]=calculate_dq(record)
                 update_recs.append(record)
                 
         else:
@@ -113,6 +134,7 @@ def merge_emails_master(df):
                 .drop(["file_id","record_id","risk_score", "is_emailduplicate", "is_corrected", "is_disposable_email","is_phone_duplicate"], errors="ignore")  
             ).to_dict()
             if (pd.notna(record["cleaned_email"])):
+                record["dq_score"]=calculate_dq(record)
                 insert_recs.append(record)
             
     if insert_recs:
@@ -123,7 +145,7 @@ def merge_emails_master(df):
         query=f"""
         INSERT INTO final_customer_email ({cols}) values %s
         """
-        cursor.execute_values(cursor,query, vals)
+        execute_values(cursor,query, vals)
         conn.commit()
     for rec in update_recs:
         cols=[

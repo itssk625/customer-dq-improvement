@@ -144,7 +144,6 @@ def main():
                     dedup_emails(df)
                     dedup_phones(df)
                     
-                    score_dq()
                     calculate_metrics() 
                     golden_phone=pd.read_sql_query("""select * from final_customer_phone order by record_id""", conn)
                     golden_email=pd.read_sql_query("""select * from final_customer_email order by record_id""", conn)
