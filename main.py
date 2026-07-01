@@ -26,7 +26,7 @@ import uuid
 st.set_page_config(layout="wide")
 
 def validate_file(df):
-    required_columns=['first_name', 'last_name', 'dob', 'country', 'gender', 'email', 'phone_no']
+    required_columns=['first_name', 'last_name', 'dob', 'country', 'gender', 'email', 'phone_no', 'upload_date']
     if df.empty:
         raise ValueError("Uploaded file is empty.")
     missing=set(required_columns)-set(df.columns)
